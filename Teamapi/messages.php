@@ -7,10 +7,17 @@ $method = $_SERVER['REQUEST_METHOD'];
 $uid    = $CURRENT_USER_ID;
 
 if ($method === 'GET') {
-    $rows = $db->query(
-        "SELECT id, member_id, sender_name, content, created_at
-         FROM messages ORDER BY created_at ASC LIMIT 100"
-    )->fetch_all(MYSQLI_ASSOC);
+    $result = $db->query(
+        "SELECT m.id, m.member_id, m.sender_name, m.content, m.created_at,
+                mb.avatar_color
+         FROM messages m
+         LEFT JOIN members mb ON mb.id = m.member_id
+         ORDER BY m.created_at ASC LIMIT 100"
+    );
+    $rows = [];
+    while ($row = $result->fetch_assoc()) {
+        $rows[] = $row;
+    }
     respond($rows);
 }
 
