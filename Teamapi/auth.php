@@ -8,7 +8,7 @@ if ($action === 'check') {
     if (!isset($_SESSION['member_id'])) respond(['logged_in' => false]);
     $id = (int)$_SESSION['member_id'];
     $r = db()->query("SELECT id, name, email, user_role, avatar_color, must_change_password FROM members WHERE id=$id AND status != 'inactive'")->fetch_assoc();
-    if ($r) respond(['logged_in' => true, 'user' => $r]);
+    if ($r) { $r['must_change_password'] = (bool)$r['must_change_password']; respond(['logged_in' => true, 'user' => $r]); }
     session_destroy();
     respond(['logged_in' => false]);
 }
