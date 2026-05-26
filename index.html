@@ -19,26 +19,25 @@
   --radius:10px;--radius-sm:6px;
 }
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;height:100vh;overflow:hidden;display:flex}
-
-/* SIDEBAR */
-.sidebar{width:210px;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;padding:0}
+.sidebar{width:210px;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
 .logo{display:flex;align-items:center;gap:10px;padding:20px 18px;border-bottom:1px solid var(--border)}
 .logo-box{width:32px;height:32px;background:var(--brand);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:700}
-.logo-text{font-size:16px;font-weight:600;color:var(--text)}
+.logo-text{font-size:16px;font-weight:600}
 nav{padding:12px 10px;flex:1}
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);color:var(--text2);cursor:pointer;font-size:13.5px;font-weight:500;margin-bottom:2px;transition:all .15s}
 .nav-item:hover{background:var(--bg);color:var(--text)}
 .nav-item.active{background:var(--brand-light);color:var(--brand-dark)}
 .nav-item svg{width:16px;height:16px;flex-shrink:0}
-.sidebar-footer{padding:16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.user-av{width:32px;height:32px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
-.user-info .name{font-size:13px;font-weight:600;color:var(--text)}
-.user-info .role{font-size:11px;color:var(--text3)}
-
-/* MAIN */
+.sidebar-footer{padding:14px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.user-av{width:32px;height:32px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.user-info{flex:1;min-width:0}
+.user-info .name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-info .urole{font-size:11px;color:var(--text3)}
+.logout-btn{background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;border-radius:4px;display:flex;align-items:center}
+.logout-btn:hover{color:var(--red);background:var(--red-bg)}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.page-title{font-size:16px;font-weight:600;color:var(--text)}
+.page-title{font-size:16px;font-weight:600}
 .topbar-right{display:flex;gap:8px;align-items:center}
 .content{flex:1;overflow-y:auto;padding:24px}
 .content::-webkit-scrollbar{width:5px}
@@ -46,31 +45,23 @@ nav{padding:12px 10px;flex:1}
 .page{display:none}
 .page.active{display:block;animation:fadeIn .18s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-
-/* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .15s}
 .btn-primary{background:var(--brand);color:#fff}.btn-primary:hover{background:var(--brand-dark)}
 .btn-ghost{background:var(--white);color:var(--text2);border:1px solid var(--border)}.btn-ghost:hover{border-color:var(--border2);color:var(--text)}
 .btn-sm{padding:5px 12px;font-size:12px}
-.btn-icon{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 8px;cursor:pointer;color:var(--text2);display:inline-flex;align-items:center;justify-content:center;transition:all .15s}
+.btn-icon{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 8px;cursor:pointer;color:var(--text2);display:inline-flex;align-items:center;transition:all .15s}
 .btn-icon:hover{background:var(--bg);color:var(--text)}
-.btn-danger-icon{border-color:#FECACA;color:var(--red)}.btn-danger-icon:hover{background:#FEE2E2}
-
-/* CARDS */
+.btn-danger-icon{border-color:#FECACA;color:var(--red)}.btn-danger-icon:hover{background:var(--red-bg)}
 .card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
 .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.card-title{font-size:14px;font-weight:600;color:var(--text)}
+.card-title{font-size:14px;font-weight:600}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-
-/* STATS */
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
 .stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px;border-top:3px solid var(--brand)}
 .stat-card.g{border-top-color:var(--green)}.stat-card.a{border-top-color:var(--amber)}.stat-card.b{border-top-color:var(--blue)}
 .stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;font-weight:500}
-.stat-val{font-size:26px;font-weight:700;color:var(--text);line-height:1}
+.stat-val{font-size:26px;font-weight:700;line-height:1}
 .stat-sub{font-size:11px;color:var(--text3);margin-top:4px}
-
-/* BADGES */
 .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
 .badge-green{background:var(--green-bg);color:#065F46}
 .badge-amber{background:var(--amber-bg);color:#92400E}
@@ -78,122 +69,116 @@ nav{padding:12px 10px;flex:1}
 .badge-blue{background:var(--blue-bg);color:#1E40AF}
 .badge-purple{background:var(--brand-light);color:var(--brand-dark)}
 .badge-gray{background:#F3F4F6;color:var(--text2)}
-
-/* ROWS */
 .row-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
 .row-item:last-child{border-bottom:none;padding-bottom:0}
 .row-item:first-child{padding-top:0}
-.row-name{font-size:13.5px;font-weight:500;color:var(--text)}
+.row-name{font-size:13.5px;font-weight:500}
 .row-sub{font-size:12px;color:var(--text3);margin-top:1px}
 .row-actions{display:flex;gap:5px;margin-left:auto;opacity:0;transition:opacity .15s}
 .row-item:hover .row-actions,.table-row:hover .row-actions{opacity:1}
-
-/* AVATAR */
 .av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
 .av-sm{width:28px;height:28px;font-size:10px}
-
-/* TABLE */
 .tbl{width:100%;border-collapse:collapse}
 .tbl th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);font-weight:500;padding:8px 12px;border-bottom:1px solid var(--border);text-align:left}
 .tbl td{padding:11px 12px;border-bottom:1px solid var(--border);font-size:13.5px;color:var(--text2);vertical-align:middle}
 .tbl tr:last-child td{border-bottom:none}
 .table-row:hover td{background:#FAFAFA}
 .name-cell{color:var(--text);font-weight:500;display:flex;align-items:center;gap:10px}
-
-/* TASKS */
 .task-item{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}
 .task-item:last-child{border-bottom:none}
 .check-circle{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border2);cursor:pointer;flex-shrink:0;margin-top:1px;transition:all .15s;display:flex;align-items:center;justify-content:center}
 .check-circle.done{background:var(--green);border-color:var(--green)}
 .check-circle.done::after{content:'✓';color:#fff;font-size:10px;font-weight:700}
-.task-title{font-size:13.5px;font-weight:500;color:var(--text)}.task-title.done{text-decoration:line-through;color:var(--text3)}
+.task-title{font-size:13.5px;font-weight:500}.task-title.done{text-decoration:line-through;color:var(--text3)}
 .task-meta{font-size:11px;color:var(--text3);margin-top:3px;display:flex;gap:8px;align-items:center}
 .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}.dot-high{background:var(--red)}.dot-med{background:var(--amber)}.dot-low{background:var(--green)}
-
-/* MESSAGES */
 .msg-list{display:flex;flex-direction:column;gap:12px;padding:4px 0 16px;min-height:300px}
-.msg{display:flex;gap:8px}
-.msg.me{flex-direction:row-reverse}
+.msg{display:flex;gap:8px}.msg.me{flex-direction:row-reverse}
 .bubble{max-width:72%;padding:9px 14px;border-radius:14px;font-size:13.5px;line-height:1.5}
 .msg.them .bubble{background:var(--bg);color:var(--text);border-bottom-left-radius:3px}
 .msg.me .bubble{background:var(--brand);color:#fff;border-bottom-right-radius:3px}
-.msg-info{font-size:11px;color:var(--text3);margin-top:3px}
-.msg.me .msg-info{text-align:right}
+.msg-info{font-size:11px;color:var(--text3);margin-top:3px}.msg.me .msg-info{text-align:right}
 .msg-bar{display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--border);margin-top:auto}
 .msg-input{flex:1;border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;font-size:13.5px;font-family:'Inter',sans-serif;color:var(--text);outline:none}
 .msg-input:focus{border-color:var(--brand)}
-
-/* PROGRESS */
 .prog{height:5px;background:var(--bg);border-radius:3px;overflow:hidden;margin-top:6px}
 .prog-bar{height:100%;border-radius:3px;background:var(--brand);transition:width .4s ease}
-
-/* FORM */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:50;align-items:center;justify-content:center}
 .modal-bg.open{display:flex}
-.modal{background:var(--white);border-radius:var(--radius);padding:24px;width:420px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.12)}
-.modal-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:18px}
+.modal{background:var(--white);border-radius:var(--radius);padding:24px;width:460px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.12)}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:18px}
 .fg{margin-bottom:13px}
 .fg label{display:block;font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
 .fg input,.fg select{width:100%;border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 11px;font-size:13.5px;font-family:'Inter',sans-serif;color:var(--text);outline:none}
 .fg input:focus,.fg select:focus{border-color:var(--brand)}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:11px}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
-
-/* SEARCH */
 .search{border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none;width:190px}
 .search:focus{border-color:var(--brand);width:220px;transition:width .2s}
-
-/* TOAST */
 .toast{position:fixed;bottom:20px;right:20px;background:var(--text);color:#fff;padding:10px 16px;border-radius:var(--radius-sm);font-size:13px;z-index:100;transform:translateY(10px);opacity:0;transition:all .25s;box-shadow:0 4px 16px rgba(0,0,0,.15)}
 .toast.show{transform:none;opacity:1}
 .toast.ok{border-left:3px solid var(--green)}.toast.err{border-left:3px solid var(--red)}
-
+.cred-box{background:var(--bg);border-radius:var(--radius-sm);padding:16px;margin:12px 0;font-size:13px;line-height:2}
+.cred-box b{color:var(--text)}
+.clock-card{text-align:center;padding:28px 20px}
+.clock-display{font-size:44px;font-weight:700;color:var(--brand);letter-spacing:-1px;margin-bottom:4px}
+.clock-status{font-size:13px;color:var(--text3);margin-bottom:20px}
+.clock-btn{padding:12px 32px;font-size:14px;border-radius:30px}
+.clock-summary{font-size:12px;color:var(--text3);margin-top:14px;min-height:18px}
 svg{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="logo">
     <div class="logo-box">T</div>
     <span class="logo-text">TeamFlow</span>
   </div>
-  <nav>
-    <div class="nav-item active" data-page="dashboard">
+  <nav id="main-nav">
+    <div class="nav-item active" data-page="dashboard" data-roles="admin director member">
       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Dashboard
+      <span class="nav-label">Dashboard</span>
     </div>
-    <div class="nav-item" data-page="members">
+    <div class="nav-item" data-page="members" data-roles="admin director" id="nav-members">
       <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-      Members
+      <span class="nav-label">Members</span>
     </div>
-    <div class="nav-item" data-page="shifts">
+    <div class="nav-item" data-page="shifts" data-roles="admin director">
       <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      Schedule
+      <span class="nav-label">Schedule</span>
     </div>
-    <div class="nav-item" data-page="tasks">
+    <div class="nav-item" data-page="tasks" data-roles="admin director member">
       <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-      Tasks
+      <span class="nav-label">Tasks</span>
     </div>
-    <div class="nav-item" data-page="messages">
+    <div class="nav-item" data-page="attendance" data-roles="admin director member">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span class="nav-label">Attendance</span>
+    </div>
+    <div class="nav-item" data-page="messages" data-roles="admin director member">
       <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-      Messages
+      <span class="nav-label">Messages</span>
     </div>
   </nav>
   <div class="sidebar-footer">
-    <div class="user-av">AD</div>
-    <div class="user-info"><div class="name">Admin</div><div class="role">Manager</div></div>
+    <div class="user-av" id="user-av">—</div>
+    <div class="user-info">
+      <div class="name" id="user-name">Loading…</div>
+      <div class="urole" id="user-role-label">—</div>
+    </div>
+    <button class="logout-btn" onclick="logout()" title="Sign out">
+      <svg viewBox="0 0 24 24" width="16" height="16"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
   </div>
 </aside>
 
-<!-- MAIN -->
 <div class="main">
   <div class="topbar">
     <span class="page-title" id="page-title">Dashboard</span>
     <div class="topbar-right">
       <input class="search" id="member-search" placeholder="Search members…" style="display:none" oninput="searchMembers(this.value)"/>
-      <button class="btn btn-primary" onclick="mainAction()">
+      <button class="btn btn-primary" id="action-btn" onclick="mainAction()">
         <svg viewBox="0 0 24 24" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         <span id="action-label">Add Member</span>
       </button>
@@ -204,21 +189,44 @@ svg{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-l
 
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
-      <div class="stats-row">
-        <div class="stat-card"><div class="stat-label">Total Members</div><div class="stat-val" id="s-members">—</div><div class="stat-sub" id="s-new">—</div></div>
-        <div class="stat-card g"><div class="stat-label">On Shift Today</div><div class="stat-val" id="s-shifts">—</div><div class="stat-sub">active now</div></div>
-        <div class="stat-card a"><div class="stat-label">Tasks Due Today</div><div class="stat-val" id="s-tasks">—</div><div class="stat-sub" id="s-done">—</div></div>
-        <div class="stat-card b"><div class="stat-label">Messages Today</div><div class="stat-val" id="s-msgs">—</div><div class="stat-sub">team chat</div></div>
-      </div>
-      <div class="two-col">
-        <div class="card">
-          <div class="card-header"><span class="card-title">Today's Shifts</span></div>
-          <div id="dash-shifts"><div style="color:var(--text3);font-size:13px;padding:8px 0">Loading…</div></div>
+      <!-- Admin/Director stats -->
+      <div id="dash-admin-stats" style="display:none">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Total Members</div><div class="stat-val" id="s-members">—</div><div class="stat-sub" id="s-new">—</div></div>
+          <div class="stat-card g"><div class="stat-label">Clocked In Now</div><div class="stat-val" id="s-clocked">—</div><div class="stat-sub">working today</div></div>
+          <div class="stat-card a"><div class="stat-label">Tasks Due Today</div><div class="stat-val" id="s-tasks">—</div><div class="stat-sub" id="s-done">—</div></div>
+          <div class="stat-card b"><div class="stat-label">Messages Today</div><div class="stat-val" id="s-msgs">—</div><div class="stat-sub">team chat</div></div>
         </div>
-        <div class="card">
-          <div class="card-header"><span class="card-title">Tasks</span><span id="task-prog-txt" style="font-size:12px;color:var(--text3)">—</span></div>
-          <div class="prog" style="margin-bottom:16px"><div class="prog-bar" id="task-prog-bar" style="width:0%"></div></div>
-          <div id="dash-tasks"></div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Today's Shifts</span></div>
+            <div id="dash-shifts"><div style="color:var(--text3);font-size:13px">Loading…</div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Tasks</span><span id="task-prog-txt" style="font-size:12px;color:var(--text3)">—</span></div>
+            <div class="prog" style="margin-bottom:16px"><div class="prog-bar" id="task-prog-bar" style="width:0%"></div></div>
+            <div id="dash-tasks"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Member dashboard -->
+      <div id="dash-member-view" style="display:none">
+        <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+          <div class="stat-card"><div class="stat-label">My Pending Tasks</div><div class="stat-val" id="m-tasks">—</div><div class="stat-sub">assigned to me</div></div>
+          <div class="stat-card g"><div class="stat-label">Messages Today</div><div class="stat-val" id="m-msgs">—</div><div class="stat-sub">team chat</div></div>
+          <div class="stat-card b"><div class="stat-label">Today's Shift</div><div class="stat-val" id="m-shift-time">—</div><div class="stat-sub" id="m-shift-status">—</div></div>
+        </div>
+        <div class="two-col">
+          <div class="card clock-card" id="clock-card">
+            <div class="clock-display" id="clock-display">0h 00m</div>
+            <div class="clock-status" id="clock-status-txt">Not clocked in today</div>
+            <button class="btn btn-primary clock-btn" id="clock-btn" onclick="toggleClock()">Clock In</button>
+            <div class="clock-summary" id="clock-summary"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">My Tasks</span></div>
+            <div id="member-tasks-list"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -227,8 +235,15 @@ svg{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-l
     <div class="page" id="page-members">
       <div class="card" style="padding:0;overflow:hidden">
         <table class="tbl">
-          <thead><tr><th>Name</th><th>Role</th><th>Department</th><th>Type</th><th>Status</th><th>Email</th><th></th></tr></thead>
-          <tbody id="members-body"><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text3)">Loading…</td></tr></tbody>
+          <thead>
+            <tr>
+              <th>Name</th><th>Job Role</th><th>Access</th><th>Department</th>
+              <th>Type</th><th>Status</th><th>Director</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="members-body">
+            <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text3)">Loading…</td></tr>
+          </tbody>
         </table>
       </div>
     </div>
@@ -240,15 +255,33 @@ svg{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-l
           <span class="card-title">Shift Schedule</span>
           <input type="date" id="shift-date-filter" class="search" style="width:auto" onchange="loadShifts()"/>
         </div>
-        <div id="shifts-list"><div style="color:var(--text3);font-size:13px">Loading…</div></div>
+        <div id="shifts-list"></div>
       </div>
     </div>
 
     <!-- TASKS -->
     <div class="page" id="page-tasks">
       <div class="card">
-        <div class="card-header"><span class="card-title">All Tasks</span></div>
+        <div class="card-header"><span class="card-title">Tasks</span></div>
         <div id="tasks-list"></div>
+      </div>
+    </div>
+
+    <!-- ATTENDANCE -->
+    <div class="page" id="page-attendance">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Attendance</span>
+          <input type="date" id="att-date-filter" class="search" style="width:auto" onchange="loadAttendance()"/>
+        </div>
+        <table class="tbl">
+          <thead>
+            <tr><th>Member</th><th>Clock In</th><th>Clock Out</th><th>Duration</th><th>Status</th></tr>
+          </thead>
+          <tbody id="att-body">
+            <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text3)">Loading…</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -276,14 +309,60 @@ svg{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-l
 <div class="modal-bg" id="modal-member">
   <div class="modal">
     <div class="modal-title" id="modal-member-title">Add Member</div>
-    <div class="form-row"><div class="fg"><label>Full name *</label><input id="m-name" placeholder="James Lee"/></div><div class="fg"><label>Email *</label><input id="m-email" type="email" placeholder="james@co.com"/></div></div>
-    <div class="form-row"><div class="fg"><label>Role</label><input id="m-role" placeholder="Floor Manager"/></div><div class="fg"><label>Department</label><input id="m-dept" placeholder="Operations"/></div></div>
     <div class="form-row">
-      <div class="fg"><label>Type</label><select id="m-type"><option value="full-time">Full-time</option><option value="part-time">Part-time</option><option value="contractor">Contractor</option></select></div>
-      <div class="fg"><label>Status</label><select id="m-status"><option value="active">Active</option><option value="on-leave">On Leave</option><option value="inactive">Inactive</option></select></div>
+      <div class="fg"><label>Full name *</label><input id="m-name" placeholder="James Lee"/></div>
+      <div class="fg"><label>Email *</label><input id="m-email" type="email" placeholder="james@co.com"/></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Job Title</label><input id="m-role" placeholder="Floor Manager"/></div>
+      <div class="fg"><label>Department</label><input id="m-dept" placeholder="Operations"/></div>
+    </div>
+    <div class="form-row">
+      <div class="fg">
+        <label>Access Level</label>
+        <select id="m-user-role" onchange="toggleDirectorField()">
+          <option value="member">Member</option>
+          <option value="director">Director</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div class="fg" id="director-field">
+        <label>Assign to Director</label>
+        <select id="m-director"><option value="">— None —</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="fg">
+        <label>Employment Type</label>
+        <select id="m-type"><option value="full-time">Full-time</option><option value="part-time">Part-time</option><option value="contractor">Contractor</option></select>
+      </div>
+      <div class="fg">
+        <label>Status</label>
+        <select id="m-status"><option value="active">Active</option><option value="on-leave">On Leave</option><option value="inactive">Inactive</option></select>
+      </div>
     </div>
     <div class="fg"><label>Phone</label><input id="m-phone" placeholder="+65 9123 4567"/></div>
-    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('modal-member')">Cancel</button><button class="btn btn-primary" onclick="saveMember()">Save</button></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-member')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveMember()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- CREDENTIALS MODAL (shown after adding member) -->
+<div class="modal-bg" id="modal-creds">
+  <div class="modal">
+    <div class="modal-title">✓ Member Added</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:4px">Share these login credentials with the new member:</p>
+    <div class="cred-box">
+      <div><b>Email:</b> <span id="cred-email"></span></div>
+      <div><b>Temp Password:</b> <span id="cred-pass" style="font-family:monospace;font-size:15px;color:var(--brand-dark)"></span></div>
+    </div>
+    <p style="font-size:12px;color:var(--text3)">The member must change this password on first login.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="copyCredentials()">Copy</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-creds')">Done</button>
+    </div>
   </div>
 </div>
 
@@ -292,9 +371,18 @@ svg{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-l
   <div class="modal">
     <div class="modal-title">Add Shift</div>
     <div class="fg"><label>Member *</label><select id="sh-member"><option value="">— Select —</option></select></div>
-    <div class="form-row"><div class="fg"><label>Date</label><input id="sh-date" type="date"/></div><div class="fg"><label>Status</label><select id="sh-status"><option value="upcoming">Upcoming</option><option value="active">Active</option><option value="completed">Completed</option><option value="absent">Absent</option></select></div></div>
-    <div class="form-row"><div class="fg"><label>Start</label><input id="sh-start" type="time" value="09:00"/></div><div class="fg"><label>End</label><input id="sh-end" type="time" value="17:00"/></div></div>
-    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('modal-shift')">Cancel</button><button class="btn btn-primary" onclick="saveShift()">Add Shift</button></div>
+    <div class="form-row">
+      <div class="fg"><label>Date</label><input id="sh-date" type="date"/></div>
+      <div class="fg"><label>Status</label><select id="sh-status"><option value="upcoming">Upcoming</option><option value="active">Active</option><option value="completed">Completed</option><option value="absent">Absent</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Start</label><input id="sh-start" type="time" value="09:00"/></div>
+      <div class="fg"><label>End</label><input id="sh-end" type="time" value="17:00"/></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-shift')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveShift()">Add Shift</button>
+    </div>
   </div>
 </div>
 
@@ -303,252 +391,499 @@ svg{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-l
   <div class="modal">
     <div class="modal-title">Add Task</div>
     <div class="fg"><label>Title *</label><input id="t-title" placeholder="e.g. Update handbook"/></div>
-    <div class="form-row"><div class="fg"><label>Assign to</label><input id="t-assigned" placeholder="Name (optional)"/></div><div class="fg"><label>Due date</label><input id="t-due" type="date"/></div></div>
+    <div class="form-row">
+      <div class="fg"><label>Assign to</label><select id="t-assigned"><option value="">— Unassigned —</option></select></div>
+      <div class="fg"><label>Due date</label><input id="t-due" type="date"/></div>
+    </div>
     <div class="form-row">
       <div class="fg"><label>Priority</label><select id="t-priority"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option></select></div>
       <div class="fg"><label>Status</label><select id="t-status"><option value="pending">Pending</option><option value="in-progress">In Progress</option><option value="completed">Completed</option></select></div>
     </div>
-    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('modal-task')">Cancel</button><button class="btn btn-primary" onclick="saveTask()">Create</button></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-task')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTask()">Create Task</button>
+    </div>
   </div>
 </div>
 
 <script>
 const API = 'Teamapi/';
-let currentPage = 'dashboard';
-let allMembers = [];
-let editId = null;
+let currentUser  = null;
+let currentPage  = 'dashboard';
+let allMembers   = [];
+let editMemberId = null;
+let clockInterval = null;
+let isClockedIn   = false;
+let clockInTime   = null;
 
-// ---- UTILS ----
-const $ = id => document.getElementById(id);
-const fmt = d => d ? new Date(d+'T00:00:00').toLocaleDateString('en-SG',{month:'short',day:'numeric'}) : '—';
-const fmtT = t => t ? t.substring(0,5) : '';
-const initials = n => n.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+// ── UTILS ─────────────────────────────────────────────────────────────
+const $   = id => document.getElementById(id);
+const fmt = d  => d ? new Date(d + 'T00:00:00').toLocaleDateString('en-SG', { month: 'short', day: 'numeric' }) : '—';
+const fmtT  = t  => t ? t.substring(0, 5) : '';
+const fmtDT = dt => dt ? new Date(dt.replace(' ', 'T')).toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit' }) : '—';
+const initials = n => (n || '?').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+const fmtDur   = m => m ? `${Math.floor(m/60)}h ${(m%60).toString().padStart(2,'0')}m` : '—';
 
-function toast(msg, type='ok') {
-  const t = $('toast'); t.textContent = msg; t.className = `toast ${type} show`;
+function toast(msg, type = 'ok') {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-async function api(endpoint, opts={}) {
+async function api(endpoint, opts = {}) {
   try {
-    const res = await fetch(API + endpoint, {
-      headers: {'Content-Type':'application/json'},
+    const res  = await fetch(API + endpoint, {
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
       ...opts,
       body: opts.body ? JSON.stringify(opts.body) : undefined
     });
     const data = await res.json();
+    if (res.status === 401 || data.redirect === 'login') { window.location.href = 'login.html'; return; }
+    if (res.status === 403 && data.redirect === 'change_password') { window.location.href = 'login.html?change=1'; return; }
     if (data.error) throw new Error(data.error);
     return data;
-  } catch(e) { toast(e.message, 'err'); throw e; }
+  } catch (e) {
+    toast(e.message, 'err');
+    throw e;
+  }
 }
 
-function av(name, color, small='') {
-  return `<div class="av ${small}" style="background:${color||'#5C6BC0'}">${initials(name)}</div>`;
+function av(name, color, cls = '') {
+  return `<div class="av ${cls}" style="background:${color || '#5C6BC0'}">${initials(name)}</div>`;
+}
+
+function roleBadge(r) {
+  const map = { admin: 'badge-purple', director: 'badge-blue', member: 'badge-gray' };
+  return `<span class="badge ${map[r] || 'badge-gray'}">${r}</span>`;
 }
 
 function statusBadge(s) {
-  const map={active:'green','on-leave':'amber',inactive:'gray',upcoming:'blue',completed:'green',absent:'red',pending:'amber','in-progress':'purple'};
-  return `<span class="badge badge-${map[s]||'gray'}">${s}</span>`;
+  const map = { active: 'green', 'on-leave': 'amber', inactive: 'gray', upcoming: 'blue', completed: 'green', absent: 'red', pending: 'amber', 'in-progress': 'purple' };
+  return `<span class="badge badge-${map[s] || 'gray'}">${s}</span>`;
 }
 
-// ---- NAV ----
-const titles = {dashboard:'Dashboard',members:'Members',shifts:'Schedule',tasks:'Tasks',messages:'Messages'};
-const actions = {dashboard:'Add Member',members:'Add Member',shifts:'Add Shift',tasks:'Add Task',messages:'Send Message'};
+// ── AUTH & INIT ────────────────────────────────────────────────────────
+async function init() {
+  try {
+    const auth = await fetch(API + 'auth.php?action=check', { credentials: 'same-origin' }).then(r => r.json());
+    if (!auth.logged_in) { window.location.href = 'login.html'; return; }
+    if (auth.user.must_change_password) { window.location.href = 'login.html?change=1'; return; }
+    currentUser = auth.user;
+    setupUI();
+    loadDashboard();
+  } catch (e) {
+    window.location.href = 'login.html';
+  }
+}
+
+function setupUI() {
+  const role = currentUser.user_role;
+  $('user-av').textContent = initials(currentUser.name);
+  $('user-av').style.background = currentUser.avatar_color || '#5C6BC0';
+  $('user-name').textContent = currentUser.name;
+  $('user-role-label').textContent = role.charAt(0).toUpperCase() + role.slice(1);
+  if (role === 'director') $('nav-members').querySelector('.nav-label').textContent = 'My Team';
+
+  document.querySelectorAll('.nav-item[data-roles]').forEach(el => {
+    if (!el.dataset.roles.split(' ').includes(role)) el.style.display = 'none';
+  });
+}
+
+async function logout() {
+  await api('auth.php?action=logout');
+  window.location.href = 'login.html';
+}
+
+// ── NAV ────────────────────────────────────────────────────────────────
+const pageTitles  = { dashboard: 'Dashboard', members: currentUser?.user_role === 'director' ? 'My Team' : 'Members', shifts: 'Schedule', tasks: 'Tasks', attendance: 'Attendance', messages: 'Messages' };
+const pageActions = { dashboard: 'Add Member', members: 'Add Member', shifts: 'Add Shift', tasks: 'Add Task', attendance: null, messages: 'Message' };
 
 document.querySelectorAll('.nav-item').forEach(n => n.addEventListener('click', () => switchPage(n.dataset.page)));
 
 function switchPage(name) {
   currentPage = name;
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page===name));
-  document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id==='page-'+name));
-  $('page-title').textContent = titles[name];
-  $('action-label').textContent = actions[name];
-  $('member-search').style.display = name==='members' ? 'block' : 'none';
-  loaders[name]();
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === name));
+  document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + name));
+  $('page-title').textContent = { dashboard: 'Dashboard', members: currentUser.user_role === 'director' ? 'My Team' : 'Members', shifts: 'Schedule', tasks: 'Tasks', attendance: 'Attendance', messages: 'Messages' }[name] || name;
+  $('member-search').style.display = name === 'members' ? 'block' : 'none';
+  const actionLabels = { dashboard: 'Add Member', members: 'Add Member', shifts: 'Add Shift', tasks: 'Add Task', attendance: null, messages: 'Message' };
+  const lbl = actionLabels[name];
+  $('action-btn').style.display = (lbl && currentUser.user_role !== 'member') ? '' : 'none';
+  if (lbl) $('action-label').textContent = lbl;
+  loaders[name]?.();
 }
 
 function mainAction() {
-  const map = {dashboard: openAddMember, members: openAddMember, shifts: openAddShift, tasks: openAddTask, messages: () => $('msg-in').focus()};
-  (map[currentPage]||openAddMember)();
+  const map = { dashboard: openAddMember, members: openAddMember, shifts: openAddShift, tasks: openAddTask, messages: () => $('msg-in').focus() };
+  (map[currentPage] || openAddMember)();
 }
 
-// ---- DASHBOARD ----
+// ── DASHBOARD ──────────────────────────────────────────────────────────
 async function loadDashboard() {
-  const s = await api('dashboard.php');
-  $('s-members').textContent = s.total_members;
-  $('s-new').textContent = `+${s.new_members} this month`;
-  $('s-shifts').textContent = s.on_shift;
-  $('s-tasks').textContent = s.tasks_due;
-  $('s-done').textContent = `${s.tasks_done} done`;
-  $('s-msgs').textContent = s.messages;
+  const s    = await api('dashboard.php');
+  if (!s) return;
+  const role = currentUser.user_role;
 
-  const shifts = await api('shifts.php');
-  $('dash-shifts').innerHTML = shifts.slice(0,5).map(s => `
-    <div class="row-item">
-      ${av(s.member_name, s.avatar_color, 'av-sm')}
-      <div><div class="row-name">${s.member_name}</div><div class="row-sub">${fmtT(s.start_time)} – ${fmtT(s.end_time)}</div></div>
-      ${statusBadge(s.status)}
-    </div>`).join('') || '<div style="color:var(--text3);font-size:13px">No shifts today</div>';
+  if (role === 'admin' || role === 'director') {
+    $('dash-admin-stats').style.display = '';
+    $('dash-member-view').style.display = 'none';
+    if (role === 'admin') {
+      $('s-members').textContent = s.total_members;
+      $('s-new').textContent     = `+${s.new_members} this month`;
+    } else {
+      $('s-members').textContent = s.team_members;
+      $('s-new').textContent     = 'in your team';
+    }
+    $('s-clocked').textContent = s.clocked_in ?? s.clocked_in;
+    $('s-tasks').textContent   = s.tasks_due;
+    $('s-done').textContent    = `${s.tasks_done ?? 0} done`;
+    $('s-msgs').textContent    = s.messages;
 
-  const tasks = await api('tasks.php');
-  const done = tasks.filter(t=>t.status==='completed').length;
-  const pct = tasks.length ? Math.round(done/tasks.length*100) : 0;
-  $('task-prog-bar').style.width = pct+'%';
-  $('task-prog-txt').textContent = `${done}/${tasks.length} done`;
-  $('dash-tasks').innerHTML = tasks.slice(0,5).map(t => `
-    <div class="task-item">
-      <div class="check-circle ${t.status==='completed'?'done':''}" onclick="toggleTask(${t.id},this)"></div>
-      <div>
-        <div class="task-title ${t.status==='completed'?'done':''}">${t.title}</div>
-        <div class="task-meta"><span class="dot dot-${t.priority==='high'?'high':t.priority==='medium'?'med':'low'}"></span>${t.priority}${t.due_date?' · due '+fmt(t.due_date):''}${t.assigned_to?' · '+t.assigned_to:''}</div>
-      </div>
-    </div>`).join('');
+    const shifts = await api('shifts.php');
+    if (!shifts) return;
+    $('dash-shifts').innerHTML = shifts.slice(0, 5).map(s =>
+      `<div class="row-item">
+         ${av(s.member_name, s.avatar_color, 'av-sm')}
+         <div><div class="row-name">${s.member_name}</div><div class="row-sub">${fmtT(s.start_time)} – ${fmtT(s.end_time)}</div></div>
+         ${statusBadge(s.status)}
+       </div>`
+    ).join('') || '<div style="color:var(--text3);font-size:13px">No shifts today</div>';
+
+    const tasks = await api('tasks.php');
+    if (!tasks) return;
+    const done = tasks.filter(t => t.status === 'completed').length;
+    const pct  = tasks.length ? Math.round(done / tasks.length * 100) : 0;
+    $('task-prog-bar').style.width = pct + '%';
+    $('task-prog-txt').textContent = `${done}/${tasks.length} done`;
+    $('dash-tasks').innerHTML = tasks.slice(0, 5).map(t =>
+      `<div class="task-item">
+         <div class="check-circle ${t.status === 'completed' ? 'done' : ''}" onclick="toggleTask(${t.id}, this)"></div>
+         <div>
+           <div class="task-title ${t.status === 'completed' ? 'done' : ''}">${t.title}</div>
+           <div class="task-meta">
+             <span class="dot dot-${t.priority === 'high' ? 'high' : t.priority === 'medium' ? 'med' : 'low'}"></span>
+             ${t.priority}${t.due_date ? ' · due ' + fmt(t.due_date) : ''}${t.assigned_name ? ' · ' + t.assigned_name : ''}
+           </div>
+         </div>
+       </div>`
+    ).join('');
+  } else {
+    $('dash-admin-stats').style.display = 'none';
+    $('dash-member-view').style.display = '';
+    $('m-tasks').textContent = s.my_tasks;
+    $('m-msgs').textContent  = s.messages;
+    if (s.today_shift) {
+      $('m-shift-time').textContent   = `${fmtT(s.today_shift.start_time)}–${fmtT(s.today_shift.end_time)}`;
+      $('m-shift-status').textContent = s.today_shift.status;
+    } else {
+      $('m-shift-time').textContent   = 'None';
+      $('m-shift-status').textContent = 'no shift today';
+    }
+    initClockFromData(s.attendance);
+    const tasks = await api('tasks.php');
+    if (!tasks) return;
+    $('member-tasks-list').innerHTML = tasks.length
+      ? tasks.map(t => `
+          <div class="task-item">
+            <div class="check-circle ${t.status === 'completed' ? 'done' : ''}" onclick="toggleTask(${t.id}, this)"></div>
+            <div><div class="task-title ${t.status === 'completed' ? 'done' : ''}">${t.title}</div>
+              <div class="task-meta"><span class="dot dot-${t.priority === 'high' ? 'high' : t.priority === 'medium' ? 'med' : 'low'}"></span>${t.priority}${t.due_date ? ' · ' + fmt(t.due_date) : ''}</div>
+            </div>
+          </div>`).join('')
+      : '<div style="color:var(--text3);font-size:13px;padding:8px 0">No tasks assigned</div>';
+  }
 }
 
-// ---- MEMBERS ----
-async function loadMembers(q='') {
-  allMembers = await api('members.php'+(q?'?q='+encodeURIComponent(q):''));
+// ── CLOCK IN / OUT ─────────────────────────────────────────────────────
+function initClockFromData(att) {
+  if (att && att.clock_in && !att.clock_out) {
+    isClockedIn = true;
+    clockInTime = new Date(att.clock_in.replace(' ', 'T'));
+    startClockTick();
+  } else if (att && att.work_minutes) {
+    $('clock-summary').textContent = `Today: ${fmtDur(att.work_minutes)} worked`;
+  }
+  updateClockBtn();
+}
+
+function startClockTick() {
+  if (clockInterval) clearInterval(clockInterval);
+  clockInterval = setInterval(() => {
+    if (!clockInTime) return;
+    const mins = Math.floor((Date.now() - clockInTime.getTime()) / 60000);
+    $('clock-display').textContent = fmtDur(mins);
+  }, 5000);
+  const mins = Math.floor((Date.now() - (clockInTime?.getTime() || Date.now())) / 60000);
+  $('clock-display').textContent = fmtDur(mins);
+}
+
+function updateClockBtn() {
+  const btn = $('clock-btn');
+  if (isClockedIn) {
+    btn.textContent = 'Clock Out';
+    btn.style.background = 'var(--red)';
+    $('clock-status-txt').textContent = 'Currently clocked in';
+  } else {
+    btn.textContent = 'Clock In';
+    btn.style.background = 'var(--brand)';
+    $('clock-status-txt').textContent = 'Not clocked in today';
+    $('clock-display').textContent = '0h 00m';
+    if (clockInterval) { clearInterval(clockInterval); clockInterval = null; }
+  }
+}
+
+async function toggleClock() {
+  if (isClockedIn) {
+    const r = await api('attendance.php?action=clock_out', { method: 'POST' });
+    if (!r) return;
+    isClockedIn = false; clockInTime = null;
+    $('clock-summary').textContent = `Today: ${fmtDur(r.work_minutes)} worked`;
+    toast('Clocked out — great work!');
+  } else {
+    const r = await api('attendance.php?action=clock_in', { method: 'POST' });
+    if (!r) return;
+    isClockedIn = true; clockInTime = new Date();
+    toast('Clocked in!');
+    startClockTick();
+  }
+  updateClockBtn();
+}
+
+// ── MEMBERS ────────────────────────────────────────────────────────────
+async function loadMembers(q = '') {
+  allMembers = await api('members.php' + (q ? '?q=' + encodeURIComponent(q) : '')) || [];
   renderMembers(allMembers);
 }
 
 function renderMembers(list) {
-  $('members-body').innerHTML = list.length ? list.map(m => `
-    <tr class="table-row">
-      <td><div class="name-cell">${av(m.name, m.avatar_color,'av-sm')} ${m.name}</div></td>
-      <td>${m.role||'—'}</td><td>${m.department||'—'}</td>
+  $('members-body').innerHTML = list.length ? list.map(m => {
+    const dir = allMembers.find(x => x.id == m.director_id);
+    return `<tr class="table-row">
+      <td><div class="name-cell">${av(m.name, m.avatar_color, 'av-sm')} ${m.name}</div></td>
+      <td>${m.role || '—'}</td>
+      <td>${roleBadge(m.user_role)}</td>
+      <td>${m.department || '—'}</td>
       <td><span class="badge badge-gray">${m.employment_type}</span></td>
       <td>${statusBadge(m.status)}</td>
-      <td style="color:var(--text3)">${m.email}</td>
+      <td style="color:var(--text3);font-size:12px">${dir ? dir.name : '—'}</td>
       <td>
+        ${currentUser.user_role === 'admin' ? `
         <div class="row-actions">
           <button class="btn-icon" onclick="openEditMember(${m.id})" title="Edit">
             <svg viewBox="0 0 24 24" width="13" height="13"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
-          <button class="btn-icon btn-danger-icon" onclick="deleteMember(${m.id})" title="Delete">
+          <button class="btn-icon btn-danger-icon" onclick="deleteMember(${m.id})" title="Deactivate">
             <svg viewBox="0 0 24 24" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
           </button>
-        </div>
+        </div>` : ''}
       </td>
-    </tr>`).join('') :
-    `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text3)">No members found</td></tr>`;
+    </tr>`;
+  }).join('') : `<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text3)">No members found</td></tr>`;
 }
 
 function searchMembers(q) { loadMembers(q); }
 
-function openAddMember() { editId=null; $('modal-member-title').textContent='Add Member'; document.getElementById('modal-member').querySelector('form')?.reset(); ['m-name','m-email','m-role','m-dept','m-phone'].forEach(id=>$(id).value=''); $('m-type').value='full-time'; $('m-status').value='active'; openModal('modal-member'); }
-
-async function openEditMember(id) {
-  editId=id;
-  $('modal-member-title').textContent='Edit Member';
-  const m = await api(`members.php?id=${id}`);
-  $('m-name').value=m.name;$('m-email').value=m.email;$('m-role').value=m.role||'';
-  $('m-dept').value=m.department||'';$('m-type').value=m.employment_type;
-  $('m-status').value=m.status;$('m-phone').value=m.phone||'';
+async function openAddMember() {
+  if (currentUser.user_role !== 'admin') return;
+  editMemberId = null;
+  $('modal-member-title').textContent = 'Add Member';
+  ['m-name','m-email','m-role','m-dept','m-phone'].forEach(id => $(id).value = '');
+  $('m-user-role').value = 'member';
+  $('m-type').value = 'full-time';
+  $('m-status').value = 'active';
+  await loadDirectorOptions();
+  toggleDirectorField();
   openModal('modal-member');
 }
 
+async function openEditMember(id) {
+  if (currentUser.user_role !== 'admin') return;
+  editMemberId = id;
+  $('modal-member-title').textContent = 'Edit Member';
+  const m = await api(`members.php?id=${id}`);
+  if (!m) return;
+  $('m-name').value      = m.name;
+  $('m-email').value     = m.email;
+  $('m-role').value      = m.role || '';
+  $('m-dept').value      = m.department || '';
+  $('m-type').value      = m.employment_type;
+  $('m-status').value    = m.status;
+  $('m-phone').value     = m.phone || '';
+  $('m-user-role').value = m.user_role;
+  await loadDirectorOptions(m.director_id);
+  toggleDirectorField();
+  openModal('modal-member');
+}
+
+async function loadDirectorOptions(selectedId = '') {
+  const directors = await api('members.php?user_role=director') || [];
+  $('m-director').innerHTML = '<option value="">— None —</option>' +
+    directors.map(d => `<option value="${d.id}" ${d.id == selectedId ? 'selected' : ''}>${d.name}</option>`).join('');
+}
+
+function toggleDirectorField() {
+  const role = $('m-user-role').value;
+  $('director-field').style.display = role === 'member' ? '' : 'none';
+}
+
 async function saveMember() {
-  const body={name:$('m-name').value,email:$('m-email').value,role:$('m-role').value,department:$('m-dept').value,employment_type:$('m-type').value,status:$('m-status').value,phone:$('m-phone').value};
-  if(!body.name||!body.email) return toast('Name and email required','err');
-  if(editId) await api(`members.php?id=${editId}`,{method:'PUT',body});
-  else await api('members.php',{method:'POST',body});
-  toast(editId?'Member updated':'Member added');
-  closeModal('modal-member'); loadMembers();
+  const body = {
+    name: $('m-name').value, email: $('m-email').value,
+    role: $('m-role').value, department: $('m-dept').value,
+    user_role: $('m-user-role').value, director_id: $('m-director').value,
+    employment_type: $('m-type').value, status: $('m-status').value,
+    phone: $('m-phone').value
+  };
+  if (!body.name || !body.email) return toast('Name and email required', 'err');
+  if (editMemberId) {
+    await api(`members.php?id=${editMemberId}`, { method: 'PUT', body });
+    toast('Member updated');
+    closeModal('modal-member');
+  } else {
+    const res = await api('members.php', { method: 'POST', body });
+    if (!res) return;
+    closeModal('modal-member');
+    $('cred-email').textContent = res.email;
+    $('cred-pass').textContent  = res.temp_password;
+    openModal('modal-creds');
+  }
+  loadMembers();
 }
 
 async function deleteMember(id) {
-  if(!confirm('Delete this member?')) return;
-  await api(`members.php?id=${id}`,{method:'DELETE'});
-  toast('Member deleted'); loadMembers();
+  if (!confirm('Deactivate this member?')) return;
+  await api(`members.php?id=${id}`, { method: 'DELETE' });
+  toast('Member deactivated');
+  loadMembers();
 }
 
-// ---- SHIFTS ----
+function copyCredentials() {
+  const text = `Email: ${$('cred-email').textContent}\nPassword: ${$('cred-pass').textContent}`;
+  navigator.clipboard.writeText(text).then(() => toast('Copied to clipboard'));
+}
+
+// ── SHIFTS ─────────────────────────────────────────────────────────────
 async function loadShifts() {
-  const date = $('shift-date-filter').value || new Date().toISOString().split('T')[0];
-  const shifts = await api(`shifts.php?date=${date}`);
-  $('shifts-list').innerHTML = shifts.length ? shifts.map(s => `
-    <div class="row-item">
-      ${av(s.member_name, s.avatar_color,'av-sm')}
-      <div style="flex:1"><div class="row-name">${s.member_name} <span style="color:var(--text3);font-weight:400;font-size:12px">${s.member_role||''}</span></div></div>
-      <span style="font-size:12px;color:var(--text2);min-width:110px">${fmtT(s.start_time)} – ${fmtT(s.end_time)}</span>
-      ${statusBadge(s.status)}
-      <button class="btn-icon btn-danger-icon" onclick="deleteShift(${s.id})">
-        <svg viewBox="0 0 24 24" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
-      </button>
-    </div>`).join('') : '<div style="color:var(--text3);font-size:13px;padding:8px 0">No shifts for this date</div>';
+  const date   = $('shift-date-filter').value || new Date().toISOString().split('T')[0];
+  const shifts = await api(`shifts.php?date=${date}`) || [];
+  $('shifts-list').innerHTML = shifts.length ? shifts.map(s =>
+    `<div class="row-item">
+       ${av(s.member_name, s.avatar_color, 'av-sm')}
+       <div style="flex:1"><div class="row-name">${s.member_name} <span style="color:var(--text3);font-weight:400;font-size:12px">${s.member_role || ''}</span></div></div>
+       <span style="font-size:12px;color:var(--text2);min-width:110px">${fmtT(s.start_time)} – ${fmtT(s.end_time)}</span>
+       ${statusBadge(s.status)}
+       ${currentUser.user_role !== 'member' ? `<button class="btn-icon btn-danger-icon" onclick="deleteShift(${s.id})">
+         <svg viewBox="0 0 24 24" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+       </button>` : ''}
+     </div>`
+  ).join('') : '<div style="color:var(--text3);font-size:13px;padding:8px 0">No shifts for this date</div>';
 }
 
 async function openAddShift() {
-  if(!allMembers.length) allMembers = await api('members.php');
-  $('sh-member').innerHTML = '<option value="">— Select member —</option>' + allMembers.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+  if (!allMembers.length) allMembers = await api('members.php') || [];
+  $('sh-member').innerHTML = '<option value="">— Select member —</option>' +
+    allMembers.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
   $('sh-date').value = $('shift-date-filter').value || new Date().toISOString().split('T')[0];
   openModal('modal-shift');
 }
 
 async function saveShift() {
-  const body={member_id:$('sh-member').value,shift_date:$('sh-date').value,start_time:$('sh-start').value,end_time:$('sh-end').value,status:$('sh-status').value};
-  if(!body.member_id) return toast('Select a member','err');
-  await api('shifts.php',{method:'POST',body});
+  const body = { member_id: $('sh-member').value, shift_date: $('sh-date').value, start_time: $('sh-start').value, end_time: $('sh-end').value, status: $('sh-status').value };
+  if (!body.member_id) return toast('Select a member', 'err');
+  await api('shifts.php', { method: 'POST', body });
   toast('Shift added'); closeModal('modal-shift'); loadShifts();
 }
 
 async function deleteShift(id) {
-  if(!confirm('Remove shift?')) return;
-  await api(`shifts.php?id=${id}`,{method:'DELETE'});
+  if (!confirm('Remove this shift?')) return;
+  await api(`shifts.php?id=${id}`, { method: 'DELETE' });
   toast('Shift removed'); loadShifts();
 }
 
-// ---- TASKS ----
+// ── TASKS ──────────────────────────────────────────────────────────────
 async function loadTasks() {
-  const tasks = await api('tasks.php');
-  $('tasks-list').innerHTML = tasks.length ? tasks.map(t=>`
-    <div class="task-item">
-      <div class="check-circle ${t.status==='completed'?'done':''}" onclick="toggleTask(${t.id},this)"></div>
-      <div style="flex:1">
-        <div class="task-title ${t.status==='completed'?'done':''}">${t.title}</div>
-        <div class="task-meta">
-          <span class="dot dot-${t.priority==='high'?'high':t.priority==='medium'?'med':'low'}"></span>
-          ${t.priority}${t.due_date?' · '+fmt(t.due_date):''}${t.assigned_to?' · '+t.assigned_to:''} · ${statusBadge(t.status)}
-        </div>
-      </div>
-      <button class="btn-icon btn-danger-icon" onclick="deleteTask(${t.id})">
-        <svg viewBox="0 0 24 24" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
-      </button>
-    </div>`).join('') : '<div style="color:var(--text3);font-size:13px;padding:8px 0">No tasks yet. Add one!</div>';
+  const tasks = await api('tasks.php') || [];
+  $('tasks-list').innerHTML = tasks.length ? tasks.map(t =>
+    `<div class="task-item">
+       <div class="check-circle ${t.status === 'completed' ? 'done' : ''}" onclick="toggleTask(${t.id}, this)"></div>
+       <div style="flex:1">
+         <div class="task-title ${t.status === 'completed' ? 'done' : ''}">${t.title}</div>
+         <div class="task-meta">
+           <span class="dot dot-${t.priority === 'high' ? 'high' : t.priority === 'medium' ? 'med' : 'low'}"></span>
+           ${t.priority}${t.due_date ? ' · ' + fmt(t.due_date) : ''}${t.assigned_name ? ' · ' + t.assigned_name : ''} · ${statusBadge(t.status)}
+         </div>
+       </div>
+       ${currentUser.user_role !== 'member' ? `<button class="btn-icon btn-danger-icon" onclick="deleteTask(${t.id})">
+         <svg viewBox="0 0 24 24" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+       </button>` : ''}
+     </div>`
+  ).join('') : '<div style="color:var(--text3);font-size:13px;padding:8px 0">No tasks yet.</div>';
 }
 
-function openAddTask() { $('t-title').value='';$('t-assigned').value='';$('t-due').value=new Date().toISOString().split('T')[0];$('t-priority').value='medium';$('t-status').value='pending'; openModal('modal-task'); }
+async function openAddTask() {
+  if (currentUser.user_role === 'member') return;
+  if (!allMembers.length) allMembers = await api('members.php') || [];
+  $('t-assigned').innerHTML = '<option value="">— Unassigned —</option>' +
+    allMembers.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  $('t-title').value = '';
+  $('t-due').value   = new Date().toISOString().split('T')[0];
+  $('t-priority').value = 'medium';
+  $('t-status').value   = 'pending';
+  openModal('modal-task');
+}
 
 async function saveTask() {
-  const body={title:$('t-title').value,assigned_to:$('t-assigned').value,due_date:$('t-due').value,priority:$('t-priority').value,status:$('t-status').value};
-  if(!body.title) return toast('Title required','err');
-  await api('tasks.php',{method:'POST',body});
+  const body = { title: $('t-title').value, assigned_to: $('t-assigned').value, due_date: $('t-due').value, priority: $('t-priority').value, status: $('t-status').value };
+  if (!body.title) return toast('Title required', 'err');
+  await api('tasks.php', { method: 'POST', body });
   toast('Task created'); closeModal('modal-task'); loadTasks();
 }
 
 async function toggleTask(id, el) {
-  const res = await api(`tasks.php?id=${id}`,{method:'POST',body:{toggle:true}});
-  el.classList.toggle('done', res.status==='completed');
+  const res = await api(`tasks.php?id=${id}`, { method: 'POST', body: { toggle: true } });
+  if (!res) return;
+  el.classList.toggle('done', res.status === 'completed');
   const title = el.nextElementSibling?.querySelector('.task-title');
-  if(title) title.classList.toggle('done', res.status==='completed');
-  toast(res.status==='completed'?'Task done!':'Task reopened');
+  if (title) title.classList.toggle('done', res.status === 'completed');
+  toast(res.status === 'completed' ? 'Task completed!' : 'Task reopened');
 }
 
 async function deleteTask(id) {
-  if(!confirm('Delete task?')) return;
-  await api(`tasks.php?id=${id}`,{method:'DELETE'});
+  if (!confirm('Delete this task?')) return;
+  await api(`tasks.php?id=${id}`, { method: 'DELETE' });
   toast('Task deleted'); loadTasks();
 }
 
-// ---- MESSAGES ----
+// ── ATTENDANCE ─────────────────────────────────────────────────────────
+async function loadAttendance() {
+  const date = $('att-date-filter').value || new Date().toISOString().split('T')[0];
+  const rows = await api(`attendance.php?date=${date}`) || [];
+  $('att-body').innerHTML = rows.length ? rows.map(r => {
+    const active = r.clock_in && !r.clock_out;
+    const badge  = r.clock_out ? 'badge-green' : (active ? 'badge-amber' : 'badge-gray');
+    const label  = r.clock_out ? 'Completed' : (active ? 'Working' : 'Absent');
+    return `<tr class="table-row">
+      <td><div class="name-cell">${av(r.member_name, r.avatar_color, 'av-sm')} ${r.member_name}</div></td>
+      <td>${fmtDT(r.clock_in)}</td>
+      <td>${fmtDT(r.clock_out)}</td>
+      <td>${active ? '<span style="color:var(--amber)">In progress</span>' : fmtDur(r.work_minutes)}</td>
+      <td><span class="badge ${badge}">${label}</span></td>
+    </tr>`;
+  }).join('')
+  : `<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text3)">No attendance records for this date</td></tr>`;
+}
+
+// ── MESSAGES ───────────────────────────────────────────────────────────
 async function loadMessages() {
-  const msgs = await api('messages.php');
+  const msgs = await api('messages.php') || [];
   const list = $('msg-list');
   list.innerHTML = msgs.map(m => {
-    const isMe = m.sender_name==='You';
-    const time = new Date(m.created_at).toLocaleTimeString('en-SG',{hour:'2-digit',minute:'2-digit'});
-    return `<div class="msg ${isMe?'me':'them'}">
-      ${!isMe?`<div class="av av-sm" style="background:var(--brand)">${initials(m.sender_name)}</div>`:''}
+    const isMe = m.member_id == currentUser.id;
+    const time = new Date(m.created_at).toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit' });
+    return `<div class="msg ${isMe ? 'me' : 'them'}">
+      ${!isMe ? `<div class="av av-sm" style="background:var(--brand)">${initials(m.sender_name)}</div>` : ''}
       <div><div class="bubble">${m.content}</div><div class="msg-info">${m.sender_name} · ${time}</div></div>
     </div>`;
   }).join('');
@@ -556,24 +891,26 @@ async function loadMessages() {
 }
 
 async function sendMsg() {
-  const inp=$('msg-in'), content=inp.value.trim();
-  if(!content) return;
-  inp.value='';
-  await api('messages.php',{method:'POST',body:{sender_name:'You',content}});
+  const inp = $('msg-in'), content = inp.value.trim();
+  if (!content) return;
+  inp.value = '';
+  await api('messages.php', { method: 'POST', body: { content } });
   loadMessages();
 }
 
-// ---- MODAL ----
-function openModal(id) { $(id).classList.add('open'); }
+// ── MODALS ─────────────────────────────────────────────────────────────
+function openModal(id)  { $(id).classList.add('open'); }
 function closeModal(id) { $(id).classList.remove('open'); }
-document.querySelectorAll('.modal-bg').forEach(m => m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); }));
+document.querySelectorAll('.modal-bg').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }));
 
-// ---- LOADERS MAP ----
-const loaders = { dashboard: loadDashboard, members: loadMembers, shifts: loadShifts, tasks: loadTasks, messages: loadMessages };
+// ── LOADERS MAP ────────────────────────────────────────────────────────
+const loaders = { dashboard: loadDashboard, members: loadMembers, shifts: loadShifts, tasks: loadTasks, attendance: loadAttendance, messages: loadMessages };
 
-// ---- INIT ----
-$('shift-date-filter').value = new Date().toISOString().split('T')[0];
-loadDashboard();
+// ── INIT ───────────────────────────────────────────────────────────────
+$('shift-date-filter').value  = new Date().toISOString().split('T')[0];
+$('att-date-filter').value    = new Date().toISOString().split('T')[0];
+$('action-btn').style.display = 'none'; // hidden until setupUI runs
+init();
 </script>
 </body>
 </html>

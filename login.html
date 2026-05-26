@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TeamFlow — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --brand:#5C6BC0;--brand-dark:#3949AB;--brand-light:#E8EAF6;
+  --bg:#F5F6FA;--white:#fff;--border:#E4E6EF;
+  --text:#1A1D2E;--text2:#6B7280;--text3:#9CA3AF;
+  --green:#10B981;--red:#EF4444;--radius:10px;--radius-sm:6px;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.box{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:36px;width:390px;max-width:95vw;box-shadow:0 4px 24px rgba(0,0,0,.07)}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.logo-box{width:36px;height:36px;background:var(--brand);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:700}
+.logo-text{font-size:18px;font-weight:600}
+h2{font-size:17px;font-weight:600;margin-bottom:5px}
+.subtitle{font-size:13px;color:var(--text2);margin-bottom:22px}
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.fg input{width:100%;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text);outline:none;transition:border .15s}
+.fg input:focus{border-color:var(--brand)}
+.btn{width:100%;padding:11px;background:var(--brand);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;margin-top:6px;transition:background .15s}
+.btn:hover{background:var(--brand-dark)}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.err{background:#FEE2E2;color:#991B1B;border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;margin-bottom:14px;display:none}
+.reqs{background:var(--bg);border-radius:var(--radius-sm);padding:12px 14px;margin:12px 0;font-size:12px;color:var(--text2)}
+.reqs li{margin-left:16px;margin-bottom:3px}
+.screen{display:none}.screen.active{display:block}
+.strength{height:3px;border-radius:2px;margin-top:6px;transition:all .3s;background:var(--border)}
+.strength.weak{background:#EF4444;width:33%}.strength.fair{background:#F59E0B;width:66%}.strength.strong{background:#10B981;width:100%}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="logo">
+    <div class="logo-box">T</div>
+    <span class="logo-text">TeamFlow</span>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="screen active" id="screen-login">
+    <h2>Welcome back</h2>
+    <p class="subtitle">Sign in to your account</p>
+    <div class="err" id="login-err"></div>
+    <div class="fg">
+      <label>Email</label>
+      <input id="l-email" type="email" placeholder="you@company.com" autocomplete="email"/>
+    </div>
+    <div class="fg">
+      <label>Password</label>
+      <input id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password"/>
+    </div>
+    <button class="btn" id="login-btn" onclick="doLogin()">Sign In</button>
+  </div>
+
+  <!-- CHANGE PASSWORD (first login) -->
+  <div class="screen" id="screen-change">
+    <h2>Set your password</h2>
+    <p class="subtitle">Your account was created with a temporary password. Create a secure one to continue.</p>
+    <div class="err" id="change-err"></div>
+    <div class="fg">
+      <label>New password</label>
+      <input id="c-new" type="password" placeholder="Min 8 characters" oninput="checkStrength(this.value)"/>
+      <div class="strength" id="strength-bar"></div>
+    </div>
+    <div class="fg">
+      <label>Confirm password</label>
+      <input id="c-confirm" type="password" placeholder="Repeat password"/>
+    </div>
+    <div class="reqs">
+      <strong>Password must contain:</strong>
+      <ul>
+        <li>At least 8 characters</li>
+        <li>At least one uppercase letter (A–Z)</li>
+        <li>At least one number (0–9)</li>
+      </ul>
+    </div>
+    <button class="btn" id="change-btn" onclick="doChangePassword()">Set Password &amp; Continue</button>
+  </div>
+</div>
+
+<script>
+const API = 'Teamapi/';
+
+async function call(endpoint, opts = {}) {
+  const res = await fetch(API + endpoint, {
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
+    ...opts,
+    body: opts.body ? JSON.stringify(opts.body) : undefined
+  });
+  return res.json();
+}
+
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideErr(id) { document.getElementById(id).style.display = 'none'; }
+
+function setLoading(btnId, on) {
+  document.getElementById(btnId).disabled = on;
+  document.getElementById(btnId).textContent = on ? 'Please wait…' : (btnId === 'login-btn' ? 'Sign In' : 'Set Password & Continue');
+}
+
+async function doLogin() {
+  hideErr('login-err');
+  const email    = document.getElementById('l-email').value.trim();
+  const password = document.getElementById('l-pass').value;
+  if (!email || !password) { showErr('login-err', 'Please enter your email and password'); return; }
+
+  setLoading('login-btn', true);
+  const data = await call('auth.php?action=login', { method: 'POST', body: { email, password } });
+  setLoading('login-btn', false);
+
+  if (data.error) { showErr('login-err', data.error); return; }
+  if (data.must_change_password) {
+    document.getElementById('screen-login').classList.remove('active');
+    document.getElementById('screen-change').classList.add('active');
+  } else {
+    window.location.href = 'index.html';
+  }
+}
+
+async function doChangePassword() {
+  hideErr('change-err');
+  const newPass     = document.getElementById('c-new').value;
+  const confirmPass = document.getElementById('c-confirm').value;
+
+  setLoading('change-btn', true);
+  const data = await call('auth.php?action=change_password', {
+    method: 'POST',
+    body: { new_password: newPass, confirm_password: confirmPass }
+  });
+  setLoading('change-btn', false);
+
+  if (data.error) { showErr('change-err', data.error); return; }
+  window.location.href = 'index.html';
+}
+
+function checkStrength(val) {
+  const bar = document.getElementById('strength-bar');
+  bar.className = 'strength';
+  if (!val) return;
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  if (score <= 1) bar.classList.add('weak');
+  else if (score === 2) bar.classList.add('fair');
+  else bar.classList.add('strong');
+}
+
+// Enter key
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const active = document.querySelector('.screen.active').id;
+  if (active === 'screen-login') doLogin();
+  else if (active === 'screen-change') doChangePassword();
+});
+
+// Redirect if ?change=1
+if (new URLSearchParams(location.search).get('change') === '1') {
+  document.getElementById('screen-login').classList.remove('active');
+  document.getElementById('screen-change').classList.add('active');
+}
+
+// Auto-redirect if already logged in
+call('auth.php?action=check').then(d => {
+  if (d.logged_in && !d.user.must_change_password) window.location.href = 'index.html';
+}).catch(() => {});
+</script>
+</body>
+</html>
