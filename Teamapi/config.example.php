@@ -1,9 +1,9 @@
 <?php
-// ✏️ EDIT THESE 4 LINES with your Truehost cPanel details
+// Copy this file to config.php and fill in your cPanel database details
 define('DB_HOST', 'localhost');
-define('DB_USER', 'your_cpanel_username_teamflow'); // from cPanel > MySQL Databases
+define('DB_USER', 'your_cpanel_username_teamflow');
 define('DB_PASS', 'your_db_password');
-define('DB_NAME', 'your_cpanel_username_teamflow'); // same prefix as cPanel username
+define('DB_NAME', 'your_cpanel_username_teamflow');
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
