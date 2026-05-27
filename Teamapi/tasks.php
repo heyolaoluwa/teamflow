@@ -18,7 +18,7 @@ function myDirectorateId($db, $uid) {
 if ($method === 'GET') {
 
     if ($role === 'admin') {
-        $rows = $db->query(
+        $res = $db->query(
             "SELECT t.*,
                     m.name         AS assigned_name,
                     m.avatar_color,
@@ -27,12 +27,12 @@ if ($method === 'GET') {
              LEFT JOIN members      m ON t.assigned_to             = m.id
              LEFT JOIN directorates d ON t.assigned_directorate_id = d.id
              ORDER BY FIELD(t.priority,'high','medium','low'), t.due_date ASC"
-        )->fetch_all(MYSQLI_ASSOC);
+        );
 
     } elseif ($role === 'director') {
         $myDir     = myDirectorateId($db, $uid);
         $dirClause = $myDir ? "OR t.assigned_directorate_id = $myDir" : '';
-        $rows = $db->query(
+        $res = $db->query(
             "SELECT t.*,
                     m.name         AS assigned_name,
                     m.avatar_color,
@@ -45,13 +45,13 @@ if ($method === 'GET') {
                 OR t.created_by   = $uid
                 $dirClause
              ORDER BY FIELD(t.priority,'high','medium','low'), t.due_date ASC"
-        )->fetch_all(MYSQLI_ASSOC);
+        );
 
     } else {
         // Member: personal tasks + tasks assigned to their directorate
         $myDir     = myDirectorateId($db, $uid);
         $dirClause = $myDir ? "OR t.assigned_directorate_id = $myDir" : '';
-        $rows = $db->query(
+        $res = $db->query(
             "SELECT t.*,
                     m.name AS assigned_name,
                     d.name AS directorate_name
@@ -61,9 +61,10 @@ if ($method === 'GET') {
              WHERE t.assigned_to = $uid
              $dirClause
              ORDER BY FIELD(t.priority,'high','medium','low'), t.due_date ASC"
-        )->fetch_all(MYSQLI_ASSOC);
+        );
     }
-    respond($rows);
+    if (!$res) respond(['error' => 'Query failed: ' . $db->error], 500);
+    respond($res->fetch_all(MYSQLI_ASSOC));
 }
 
 // ── POST — toggle status or create new task ──────────────────────────────
@@ -103,12 +104,13 @@ if ($method === 'POST') {
     if (!$title) respond(['error' => 'Title required'], 400);
 
     $due_val = $due ? "'$due'" : 'NULL';
-    $db->query(
+    $ok = $db->query(
         "INSERT INTO tasks
              (title, assigned_to, assigned_directorate_id, due_date, priority, status, created_by)
          VALUES
              ('$title', $asgn_to, $asgn_dir, $due_val, '$priority', '$status', $uid)"
     );
+    if (!$ok) respond(['error' => 'Insert failed: ' . $db->error], 500);
     respond(['success' => true, 'id' => $db->insert_id], 201);
 }
 
