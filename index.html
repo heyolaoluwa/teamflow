@@ -330,7 +330,7 @@ svg{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-l
       <div id="dash-admin-stats" style="display:none">
         <div class="stats-row">
           <div class="stat-card"><div class="stat-label">Total Members</div><div class="stat-val" id="s-members">—</div><div class="stat-sub" id="s-new">—</div></div>
-          <div class="stat-card g"><div class="stat-label">Clocked In Now</div><div class="stat-val" id="s-clocked">—</div><div class="stat-sub">working today</div></div>
+          <div class="stat-card g"><div class="stat-label">Clocked In Now</div><div class="stat-val" id="s-clocked">—</div><div class="stat-sub" id="s-clocked-sub">working today</div></div>
           <div class="stat-card a"><div class="stat-label">Tasks Due Today</div><div class="stat-val" id="s-tasks">—</div><div class="stat-sub" id="s-done">—</div></div>
           <div class="stat-card b"><div class="stat-label">Messages Today</div><div class="stat-val" id="s-msgs">—</div><div class="stat-sub">team chat</div></div>
         </div>
@@ -346,8 +346,29 @@ svg{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-l
           </div>
         </div>
       </div>
-      <div id="dash-member-view" style="display:none">
+      <!-- Director-only stats strip (no total-members count) -->
+      <div id="dash-director-stats" style="display:none">
         <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+          <div class="stat-card g">
+            <div class="stat-label">Directorate Clocked In</div>
+            <div class="stat-val" id="ds-clocked">—</div>
+            <div class="stat-sub" id="ds-clocked-sub">in your directorate</div>
+          </div>
+          <div class="stat-card a">
+            <div class="stat-label">Tasks Due Today</div>
+            <div class="stat-val" id="ds-tasks">—</div>
+            <div class="stat-sub">directorate scope</div>
+          </div>
+          <div class="stat-card b">
+            <div class="stat-label">Messages Today</div>
+            <div class="stat-val" id="ds-msgs">—</div>
+            <div class="stat-sub">team chat</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="dash-member-view" style="display:none">
+        <div class="stats-row" style="grid-template-columns:repeat(3,1fr)" id="member-stats-row">
           <div class="stat-card"><div class="stat-label">My Pending Tasks</div><div class="stat-val" id="m-tasks">—</div><div class="stat-sub">assigned to me</div></div>
           <div class="stat-card g"><div class="stat-label">Messages Today</div><div class="stat-val" id="m-msgs">—</div><div class="stat-sub">team chat</div></div>
           <div class="stat-card b"><div class="stat-label">Today's Shift</div><div class="stat-val" id="m-shift-time">—</div><div class="stat-sub" id="m-shift-status">—</div></div>
@@ -736,12 +757,13 @@ function switchPage(name) {
     attendance: null, messages: null,
     directorates: 'Add Directorate'
   };
-  const lbl = actionLabels[name];
-  const canSeeBtn = lbl && (
-    name === 'directorates'
-      ? currentUser?.user_role === 'admin'
-      : currentUser?.user_role !== 'member'
-  );
+  const lbl  = actionLabels[name];
+  const isAdmin    = currentUser?.user_role === 'admin';
+  const isNonMember = currentUser?.user_role !== 'member';
+  // Add Member and Add Directorate: admin only
+  // Add Shift, Add Task: admin + director
+  const adminOnlyPages = ['dashboard', 'members', 'directorates'];
+  const canSeeBtn = lbl && (adminOnlyPages.includes(name) ? isAdmin : isNonMember);
   $('action-btn').style.display = canSeeBtn ? '' : 'none';
   if (lbl) $('action-label').textContent = lbl;
   if (name === 'messages') startMsgPolling();
@@ -763,28 +785,30 @@ async function loadDashboard() {
   if (!s) return;
   const role = currentUser.user_role;
 
-  if (role === 'admin' || role === 'director') {
-    $('dash-admin-stats').style.display = '';
-    $('dash-member-view').style.display = 'none';
-    if (role === 'admin') {
-      $('s-members').textContent = s.total_members;
-      $('s-new').textContent     = `+${s.new_members} this month`;
-    } else {
-      $('s-members').textContent = s.team_members;
-      $('s-new').textContent     = 'in your team';
-    }
-    $('s-clocked').textContent = s.clocked_in ?? '0';
-    $('s-tasks').textContent   = s.tasks_due;
-    $('s-done').textContent    = `${s.tasks_done ?? 0} done`;
-    $('s-msgs').textContent    = s.messages;
+  // Show/hide the three dashboard sections
+  $('dash-admin-stats').style.display    = role === 'admin'    ? '' : 'none';
+  $('dash-director-stats').style.display = role === 'director' ? '' : 'none';
+  $('dash-member-view').style.display    = role !== 'admin'    ? '' : 'none';
+  // Member-only personal stats strip (hidden for directors — they have their own strip)
+  $('member-stats-row').style.display    = role === 'member'   ? '' : 'none';
+
+  // ── ADMIN ───────────────────────────────────────────────────────────
+  if (role === 'admin') {
+    $('s-members').textContent     = s.total_members;
+    $('s-new').textContent         = `+${s.new_members} this month`;
+    $('s-clocked').textContent     = s.clocked_in ?? '0';
+    $('s-clocked-sub').textContent = `${s.total_work_hours ?? 0} hrs logged today`;
+    $('s-tasks').textContent       = s.tasks_due;
+    $('s-done').textContent        = `${s.tasks_done ?? 0} done`;
+    $('s-msgs').textContent        = s.messages;
 
     const shifts = await api('shifts.php');
     if (!shifts) return;
-    $('dash-shifts').innerHTML = shifts.slice(0, 5).map(s =>
+    $('dash-shifts').innerHTML = shifts.slice(0, 5).map(sh =>
       `<div class="row-item">
-         ${av(s.member_name, s.avatar_color, 'av-sm')}
-         <div><div class="row-name">${escHtml(s.member_name)}</div><div class="row-sub">${fmtT(s.start_time)} – ${fmtT(s.end_time)}</div></div>
-         ${statusBadge(s.status)}
+         ${av(sh.member_name, sh.avatar_color, 'av-sm')}
+         <div><div class="row-name">${escHtml(sh.member_name)}</div><div class="row-sub">${fmtT(sh.start_time)} – ${fmtT(sh.end_time)}</div></div>
+         ${statusBadge(sh.status)}
        </div>`
     ).join('') || '<div style="color:var(--text3);font-size:13px">No shifts today</div>';
 
@@ -806,9 +830,41 @@ async function loadDashboard() {
          </div>
        </div>`
     ).join('');
+
+  // ── DIRECTOR ──────────────────────────────────────────────────────
+  } else if (role === 'director') {
+    // Directorate-wide stats strip
+    $('ds-clocked').textContent     = s.dir_clocked_in ?? '0';
+    $('ds-clocked-sub').textContent = `${s.dir_total_hours ?? 0} hrs logged today`;
+    $('ds-tasks').textContent       = s.tasks_due;
+    $('ds-msgs').textContent        = s.messages;
+
+    // Personal clock-in section (reuses member-view clock card)
+    $('m-tasks').textContent = s.my_tasks;
+    $('m-msgs').textContent  = s.messages;
+    if (s.today_shift) {
+      $('m-shift-time').textContent   = `${fmtT(s.today_shift.start_time)}–${fmtT(s.today_shift.end_time)}`;
+      $('m-shift-status').textContent = s.today_shift.status;
+    } else {
+      $('m-shift-time').textContent   = 'None';
+      $('m-shift-status').textContent = 'no shift today';
+    }
+    initClockFromData(s.attendance);
+
+    const tasks = await api('tasks.php');
+    if (!tasks) return;
+    $('member-tasks-list').innerHTML = tasks.length
+      ? tasks.map(t => `
+          <div class="task-item">
+            <div class="check-circle ${t.status === 'completed' ? 'done' : ''}" onclick="toggleTask(${t.id}, this)"></div>
+            <div><div class="task-title ${t.status === 'completed' ? 'done' : ''}">${escHtml(t.title)}</div>
+              <div class="task-meta"><span class="dot dot-${t.priority === 'high' ? 'high' : t.priority === 'medium' ? 'med' : 'low'}"></span>${t.priority}${t.due_date ? ' · ' + fmt(t.due_date) : ''}${taskAssignInfo(t)}</div>
+            </div>
+          </div>`).join('')
+      : '<div style="color:var(--text3);font-size:13px;padding:8px 0">No tasks assigned</div>';
+
+  // ── MEMBER ────────────────────────────────────────────────────────
   } else {
-    $('dash-admin-stats').style.display = 'none';
-    $('dash-member-view').style.display = '';
     $('m-tasks').textContent = s.my_tasks;
     $('m-msgs').textContent  = s.messages;
     if (s.today_shift) {

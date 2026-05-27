@@ -45,10 +45,15 @@ if ($method === 'GET') {
              WHERE a.date='$date' ORDER BY a.clock_in DESC"
         )->fetch_all(MYSQLI_ASSOC);
     } elseif ($role === 'director') {
+        $myDirRow = $db->query("SELECT directorate_id FROM members WHERE id=$uid")->fetch_assoc();
+        $myDirId  = $myDirRow ? (int)$myDirRow['directorate_id'] : 0;
+        $scope    = $myDirId > 0
+            ? "m.directorate_id = $myDirId"
+            : "(m.director_id = $uid OR a.member_id = $uid)";
         $rows = $db->query(
             "SELECT a.*, m.name AS member_name, m.avatar_color, m.role AS job_role
              FROM attendance a JOIN members m ON a.member_id = m.id
-             WHERE a.date='$date' AND (m.director_id=$uid OR a.member_id=$uid)
+             WHERE a.date='$date' AND ($scope)
              ORDER BY a.clock_in DESC"
         )->fetch_all(MYSQLI_ASSOC);
     } else {

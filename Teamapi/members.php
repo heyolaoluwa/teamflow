@@ -40,8 +40,12 @@ if ($method === 'GET') {
     $where = "status != 'inactive'";
     if ($q)           $where .= " AND (name LIKE '%$q%' OR email LIKE '%$q%' OR role LIKE '%$q%' OR department LIKE '%$q%')";
     if ($role_filter) $where .= " AND user_role = '$role_filter'";
-    if ($role === 'director')   $where .= " AND (director_id = $uid OR id = $uid)";
-    elseif ($role === 'member') $where .= " AND id = $uid";
+    if ($role === 'director') {
+        $myDirRow = $db->query("SELECT directorate_id FROM members WHERE id=$uid")->fetch_assoc();
+        $myDirId  = $myDirRow ? (int)$myDirRow['directorate_id'] : 0;
+        if ($myDirId > 0) $where .= " AND directorate_id = $myDirId";
+        else               $where .= " AND (director_id = $uid OR id = $uid)";
+    } elseif ($role === 'member') $where .= " AND id = $uid";
 
     $rows = $db->query(
         "SELECT id, name, email, role, user_role, department, employment_type, status,
