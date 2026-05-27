@@ -234,6 +234,23 @@ svg{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-l
   .bubble{max-width:82%}
   .tbl th,.tbl td{font-size:12px;padding:8px 8px}
 }
+
+/* ── DIRECTORATES ────────────────────────────────────────────────────── */
+.dir-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.dir-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px;transition:box-shadow .2s,transform .2s}
+.dir-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.08);transform:translateY(-2px)}
+.dir-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:12px}
+.dir-name{font-size:15px;font-weight:600;color:var(--text)}
+.dir-desc{font-size:12px;color:var(--text3);margin-top:3px}
+.dir-actions{display:flex;gap:5px;flex-shrink:0}
+.dir-footer{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)}
+/* assign-type radio toggle in task modal */
+.assign-toggle{display:flex;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:0}
+.assign-toggle input[type=radio]{display:none}
+.assign-toggle label{flex:1;text-align:center;padding:7px 10px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;color:var(--text2);background:var(--white)}
+.assign-toggle input[type=radio]:checked + label{background:var(--brand);color:#fff}
+/* directorate badge on tasks */
+.badge-dir{background:#EDE7F6;color:#4527A0}
 </style>
 </head>
 <body>
@@ -271,6 +288,10 @@ svg{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-l
       <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
       <span class="nav-label">Messages</span>
       <span class="nav-badge" id="msg-nav-badge">0</span>
+    </div>
+    <div class="nav-item" data-page="directorates" data-roles="admin" id="nav-directorates">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="nav-label">Directorates</span>
     </div>
   </nav>
   <div class="sidebar-footer">
@@ -422,6 +443,11 @@ svg{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-l
       </div>
     </div>
 
+    <!-- DIRECTORATES -->
+    <div class="page" id="page-directorates">
+      <div id="directorates-list" class="dir-grid"></div>
+    </div>
+
   </div>
 </div>
 
@@ -453,6 +479,10 @@ svg{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-l
         <label>Assign to Director</label>
         <select id="m-director"><option value="">— None —</option></select>
       </div>
+    </div>
+    <div class="fg">
+      <label>Directorate</label>
+      <select id="m-directorate"><option value="">— None —</option></select>
     </div>
     <div class="form-row">
       <div class="fg">
@@ -514,8 +544,24 @@ svg{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-l
   <div class="modal">
     <div class="modal-title">Add Task</div>
     <div class="fg"><label>Title *</label><input id="t-title" placeholder="e.g. Update handbook"/></div>
+    <div class="fg">
+      <label>Assign Type</label>
+      <div class="assign-toggle">
+        <input type="radio" name="t-assign-type" id="t-type-member" value="member" checked onchange="toggleTaskAssignType()">
+        <label for="t-type-member">Member / Director</label>
+        <input type="radio" name="t-assign-type" id="t-type-dir" value="directorate" onchange="toggleTaskAssignType()">
+        <label for="t-type-dir">Whole Directorate</label>
+      </div>
+    </div>
     <div class="form-row">
-      <div class="fg"><label>Assign to</label><select id="t-assigned"><option value="">— Unassigned —</option></select></div>
+      <div class="fg" id="t-member-field">
+        <label>Member</label>
+        <select id="t-assigned"><option value="">— Unassigned —</option></select>
+      </div>
+      <div class="fg" id="t-directorate-field" style="display:none">
+        <label>Directorate</label>
+        <select id="t-directorate"><option value="">— Select —</option></select>
+      </div>
       <div class="fg"><label>Due date</label><input id="t-due" type="date"/></div>
     </div>
     <div class="form-row">
@@ -525,6 +571,20 @@ svg{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-l
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('modal-task')">Cancel</button>
       <button class="btn btn-primary" onclick="saveTask()">Create Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- DIRECTORATE MODAL -->
+<div class="modal-bg" id="modal-directorate">
+  <div class="modal">
+    <div class="modal-title" id="modal-dir-title">New Directorate</div>
+    <div class="fg"><label>Name *</label><input id="dir-name" placeholder="e.g. Engineering Directorate"/></div>
+    <div class="fg"><label>Description</label><input id="dir-desc" placeholder="Brief description (optional)"/></div>
+    <div class="fg"><label>Team Lead (Director)</label><select id="dir-director"><option value="">— None —</option></select></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-directorate')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveDirectorate()">Save</button>
     </div>
   </div>
 </div>
@@ -666,19 +726,34 @@ function switchPage(name) {
   $('page-title').textContent = {
     dashboard: 'Dashboard',
     members: currentUser?.user_role === 'director' ? 'My Team' : 'Members',
-    shifts: 'Schedule', tasks: 'Tasks', attendance: 'Attendance', messages: 'Messages'
+    shifts: 'Schedule', tasks: 'Tasks', attendance: 'Attendance',
+    messages: 'Messages', directorates: 'Directorates'
   }[name] || name;
   $('member-search').style.display = name === 'members' ? 'block' : 'none';
-  const actionLabels = { dashboard: 'Add Member', members: 'Add Member', shifts: 'Add Shift', tasks: 'Add Task', attendance: null, messages: null };
+  const actionLabels = {
+    dashboard: 'Add Member', members: 'Add Member',
+    shifts: 'Add Shift', tasks: 'Add Task',
+    attendance: null, messages: null,
+    directorates: 'Add Directorate'
+  };
   const lbl = actionLabels[name];
-  $('action-btn').style.display = (lbl && currentUser?.user_role !== 'member') ? '' : 'none';
+  const canSeeBtn = lbl && (
+    name === 'directorates'
+      ? currentUser?.user_role === 'admin'
+      : currentUser?.user_role !== 'member'
+  );
+  $('action-btn').style.display = canSeeBtn ? '' : 'none';
   if (lbl) $('action-label').textContent = lbl;
   if (name === 'messages') startMsgPolling();
   else loaders[name]?.();
 }
 
 function mainAction() {
-  const map = { dashboard: openAddMember, members: openAddMember, shifts: openAddShift, tasks: openAddTask };
+  const map = {
+    dashboard: openAddMember, members: openAddMember,
+    shifts: openAddShift, tasks: openAddTask,
+    directorates: openAddDirectorate
+  };
   (map[currentPage] || openAddMember)();
 }
 
@@ -726,7 +801,7 @@ async function loadDashboard() {
            <div class="task-title ${t.status === 'completed' ? 'done' : ''}">${escHtml(t.title)}</div>
            <div class="task-meta">
              <span class="dot dot-${t.priority === 'high' ? 'high' : t.priority === 'medium' ? 'med' : 'low'}"></span>
-             ${t.priority}${t.due_date ? ' · due ' + fmt(t.due_date) : ''}${t.assigned_name ? ' · ' + escHtml(t.assigned_name) : ''}
+             ${t.priority}${t.due_date ? ' · due ' + fmt(t.due_date) : ''}${taskAssignInfo(t)}
            </div>
          </div>
        </div>`
@@ -751,7 +826,7 @@ async function loadDashboard() {
           <div class="task-item">
             <div class="check-circle ${t.status === 'completed' ? 'done' : ''}" onclick="toggleTask(${t.id}, this)"></div>
             <div><div class="task-title ${t.status === 'completed' ? 'done' : ''}">${escHtml(t.title)}</div>
-              <div class="task-meta"><span class="dot dot-${t.priority === 'high' ? 'high' : t.priority === 'medium' ? 'med' : 'low'}"></span>${t.priority}${t.due_date ? ' · ' + fmt(t.due_date) : ''}</div>
+              <div class="task-meta"><span class="dot dot-${t.priority === 'high' ? 'high' : t.priority === 'medium' ? 'med' : 'low'}"></span>${t.priority}${t.due_date ? ' · ' + fmt(t.due_date) : ''}${taskAssignInfo(t)}</div>
             </div>
           </div>`).join('')
       : '<div style="color:var(--text3);font-size:13px;padding:8px 0">No tasks assigned</div>';
@@ -858,6 +933,7 @@ async function openAddMember() {
   $('m-type').value = 'full-time';
   $('m-status').value = 'active';
   await loadDirectorOptions();
+  await loadMemberDirectorateOptions();
   toggleDirectorField();
   openModal('modal-member');
 }
@@ -877,6 +953,7 @@ async function openEditMember(id) {
   $('m-phone').value     = m.phone || '';
   $('m-user-role').value = m.user_role;
   await loadDirectorOptions(m.director_id);
+  await loadMemberDirectorateOptions(m.directorate_id);
   toggleDirectorField();
   openModal('modal-member');
 }
@@ -897,6 +974,7 @@ async function saveMember() {
     name: $('m-name').value, email: $('m-email').value,
     role: $('m-role').value, department: $('m-dept').value,
     user_role: $('m-user-role').value, director_id: $('m-director').value,
+    directorate_id: $('m-directorate').value,
     employment_type: $('m-type').value, status: $('m-status').value,
     phone: $('m-phone').value
   };
@@ -976,7 +1054,7 @@ async function loadTasks() {
          <div class="task-title ${t.status === 'completed' ? 'done' : ''}">${escHtml(t.title)}</div>
          <div class="task-meta">
            <span class="dot dot-${t.priority === 'high' ? 'high' : t.priority === 'medium' ? 'med' : 'low'}"></span>
-           ${t.priority}${t.due_date ? ' · ' + fmt(t.due_date) : ''}${t.assigned_name ? ' · ' + escHtml(t.assigned_name) : ''} · ${statusBadge(t.status)}
+           ${t.priority}${t.due_date ? ' · ' + fmt(t.due_date) : ''}${taskAssignInfo(t)} · ${statusBadge(t.status)}
          </div>
        </div>
        ${currentUser.user_role !== 'member' ? `<button class="btn-icon btn-danger-icon" onclick="deleteTask(${t.id})">
@@ -991,16 +1069,30 @@ async function openAddTask() {
   if (!allMembers.length) allMembers = await api('members.php') || [];
   $('t-assigned').innerHTML = '<option value="">— Unassigned —</option>' +
     allMembers.map(m => `<option value="${m.id}">${escHtml(m.name)}</option>`).join('');
+  await loadTaskDirectorateOptions();
   $('t-title').value = '';
   $('t-due').value   = new Date().toISOString().split('T')[0];
   $('t-priority').value = 'medium';
   $('t-status').value   = 'pending';
+  // reset assign type to member
+  $('t-type-member').checked = true;
+  toggleTaskAssignType();
   openModal('modal-task');
 }
 
 async function saveTask() {
-  const body = { title: $('t-title').value, assigned_to: $('t-assigned').value, due_date: $('t-due').value, priority: $('t-priority').value, status: $('t-status').value };
+  const assignType = document.querySelector('input[name="t-assign-type"]:checked')?.value || 'member';
+  const body = {
+    title:                   $('t-title').value,
+    assigned_to:             assignType === 'member'      ? $('t-assigned').value    : '',
+    assigned_directorate_id: assignType === 'directorate' ? $('t-directorate').value : '',
+    due_date:  $('t-due').value,
+    priority:  $('t-priority').value,
+    status:    $('t-status').value
+  };
   if (!body.title) return toast('Title required', 'err');
+  if (assignType === 'directorate' && !body.assigned_directorate_id)
+    return toast('Please select a directorate', 'err');
   await api('tasks.php', { method: 'POST', body });
   toast('Task created'); closeModal('modal-task'); loadTasks();
 }
@@ -1117,14 +1209,133 @@ function openModal(id)  { $(id).classList.add('open'); }
 function closeModal(id) { $(id).classList.remove('open'); }
 document.querySelectorAll('.modal-bg').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }));
 
+// ── TASK ASSIGN HELPERS ────────────────────────────────────────────────
+function taskAssignInfo(t) {
+  if (t.directorate_name)
+    return ` · <span class="badge badge-dir">${escHtml(t.directorate_name)}</span>`;
+  if (t.assigned_name) return ` · ${escHtml(t.assigned_name)}`;
+  return '';
+}
+
+function toggleTaskAssignType() {
+  const type = document.querySelector('input[name="t-assign-type"]:checked')?.value || 'member';
+  $('t-member-field').style.display      = type === 'member'      ? '' : 'none';
+  $('t-directorate-field').style.display = type === 'directorate' ? '' : 'none';
+}
+
+async function loadTaskDirectorateOptions() {
+  const dirs = await api('directorates.php') || [];
+  $('t-directorate').innerHTML = '<option value="">— Select —</option>' +
+    dirs.map(d => `<option value="${d.id}">${escHtml(d.name)}</option>`).join('');
+}
+
+// ── DIRECTORATES ───────────────────────────────────────────────────────
+let allDirectorates  = [];
+let editDirectorateId = null;
+
+async function loadDirectorates() {
+  allDirectorates = await api('directorates.php') || [];
+  const el = $('directorates-list');
+  if (!allDirectorates.length) {
+    el.innerHTML = `<div style="color:var(--text3);font-size:13px;padding:20px 0;grid-column:1/-1">
+      No directorates yet. Click <b>Add Directorate</b> to create the first one.
+    </div>`;
+    return;
+  }
+  el.innerHTML = allDirectorates.map(d => `
+    <div class="dir-card">
+      <div class="dir-card-top">
+        <div>
+          <div class="dir-name">${escHtml(d.name)}</div>
+          ${d.description ? `<div class="dir-desc">${escHtml(d.description)}</div>` : ''}
+        </div>
+        ${currentUser.user_role === 'admin' ? `
+        <div class="dir-actions">
+          <button class="btn-icon" onclick="openEditDirectorate(${d.id})" title="Edit">
+            <svg viewBox="0 0 24 24" width="13" height="13"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn-icon btn-danger-icon" onclick="deleteDirectorate(${d.id})" title="Delete">
+            <svg viewBox="0 0 24 24" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>` : ''}
+      </div>
+      <div class="dir-footer">
+        ${d.director_name
+          ? `${av(d.director_name, d.director_color, 'av-sm')}
+             <span><b>Lead:</b> ${escHtml(d.director_name)}</span>`
+          : '<span style="color:var(--text3)">No team lead assigned</span>'}
+        <span style="margin-left:auto" class="badge badge-blue">
+          ${d.member_count} member${d.member_count != 1 ? 's' : ''}
+        </span>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function openAddDirectorate() {
+  editDirectorateId = null;
+  $('modal-dir-title').textContent = 'New Directorate';
+  $('dir-name').value = '';
+  $('dir-desc').value = '';
+  await loadDirLeadOptions();
+  $('dir-director').value = '';
+  openModal('modal-directorate');
+}
+
+async function openEditDirectorate(id) {
+  editDirectorateId = id;
+  $('modal-dir-title').textContent = 'Edit Directorate';
+  const d = allDirectorates.find(x => x.id == id);
+  if (!d) return;
+  $('dir-name').value = d.name;
+  $('dir-desc').value = d.description || '';
+  await loadDirLeadOptions(d.director_id);
+  openModal('modal-directorate');
+}
+
+async function saveDirectorate() {
+  const name = $('dir-name').value.trim();
+  if (!name) return toast('Name is required', 'err');
+  const body = { name, description: $('dir-desc').value, director_id: $('dir-director').value };
+  if (editDirectorateId) {
+    await api(`directorates.php?id=${editDirectorateId}`, { method: 'PUT', body });
+    toast('Directorate updated');
+  } else {
+    await api('directorates.php', { method: 'POST', body });
+    toast('Directorate created');
+  }
+  closeModal('modal-directorate');
+  loadDirectorates();
+}
+
+async function deleteDirectorate(id) {
+  if (!confirm('Delete this directorate? Members will be unlinked from it.')) return;
+  await api(`directorates.php?id=${id}`, { method: 'DELETE' });
+  toast('Directorate deleted');
+  loadDirectorates();
+}
+
+async function loadDirLeadOptions(selectedId = '') {
+  const directors = await api('members.php?user_role=director') || [];
+  $('dir-director').innerHTML = '<option value="">— None —</option>' +
+    directors.map(d => `<option value="${d.id}" ${d.id == selectedId ? 'selected' : ''}>${escHtml(d.name)}</option>`).join('');
+}
+
+async function loadMemberDirectorateOptions(selectedId = '') {
+  const dirs = await api('directorates.php') || [];
+  $('m-directorate').innerHTML = '<option value="">— None —</option>' +
+    dirs.map(d => `<option value="${d.id}" ${d.id == selectedId ? 'selected' : ''}>${escHtml(d.name)}</option>`).join('');
+}
+
 // ── LOADERS MAP ────────────────────────────────────────────────────────
 const loaders = {
-  dashboard: loadDashboard,
-  members:   loadMembers,
-  shifts:    loadShifts,
-  tasks:     loadTasks,
-  attendance:loadAttendance,
-  messages:  startMsgPolling
+  dashboard:    loadDashboard,
+  members:      loadMembers,
+  shifts:       loadShifts,
+  tasks:        loadTasks,
+  attendance:   loadAttendance,
+  messages:     startMsgPolling,
+  directorates: loadDirectorates
 };
 
 // ── INIT ───────────────────────────────────────────────────────────────
