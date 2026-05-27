@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS directorates (
 );
 
 -- Step 2: Add new columns to existing tables
-ALTER TABLE members ADD COLUMN IF NOT EXISTS directorate_id INT NULL;
-ALTER TABLE tasks   ADD COLUMN IF NOT EXISTS assigned_directorate_id INT NULL;
+ALTER TABLE members ADD COLUMN directorate_id INT NULL;
+ALTER TABLE tasks   ADD COLUMN assigned_directorate_id INT NULL;
 
 -- Step 3: Add foreign keys (safe to skip if they already exist)
 ALTER TABLE members

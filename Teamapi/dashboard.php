@@ -24,6 +24,10 @@ if ($role === 'admin') {
     )->fetch_assoc()['c'];
     $total_work_min = $work_min_done + $active_mins;
 
+    $pending_req = (int)$db->query(
+        "SELECT COUNT(*) c FROM leave_requests WHERE status='pending'"
+    )->fetch_assoc()['c'];
+
     respond([
         'total_members'    => $total_members,
         'new_members'      => $new_members,
@@ -33,6 +37,7 @@ if ($role === 'admin') {
         'clocked_in'       => $clocked_in,
         'total_work_hours' => round($total_work_min / 60, 1),
         'total_work_min'   => $total_work_min,
+        'pending_requests' => $pending_req,
     ]);
 }
 
@@ -96,6 +101,13 @@ if ($role === 'director') {
          WHERE member_id=$uid AND date='$today' ORDER BY id DESC LIMIT 1"
     )->fetch_assoc();
 
+    $dirPendReqScope = $myDirId > 0
+        ? "member_id IN (SELECT id FROM members WHERE directorate_id=$myDirId AND status!='inactive') OR member_id=$uid"
+        : "member_id IN (SELECT id FROM members WHERE director_id=$uid) OR member_id=$uid";
+    $dir_pending_req = (int)$db->query(
+        "SELECT COUNT(*) c FROM leave_requests WHERE status='pending' AND ($dirPendReqScope)"
+    )->fetch_assoc()['c'];
+
     respond([
         'dir_clocked_in'   => $dir_clocked,
         'dir_total_hours'  => $dir_total_hours,
@@ -104,6 +116,7 @@ if ($role === 'director') {
         'my_tasks'         => $my_tasks,
         'today_shift'      => $today_shift ?: null,
         'attendance'       => $attendance  ?: null,
+        'pending_requests' => $dir_pending_req,
     ]);
 }
 
@@ -113,9 +126,14 @@ $messages    = (int)$db->query("SELECT COUNT(*) c FROM messages WHERE DATE(creat
 $today_shift = $db->query("SELECT * FROM shifts WHERE member_id=$uid AND shift_date='$today' LIMIT 1")->fetch_assoc();
 $attendance  = $db->query("SELECT clock_in, clock_out, work_minutes FROM attendance WHERE member_id=$uid AND date='$today' ORDER BY id DESC LIMIT 1")->fetch_assoc();
 
+$my_pending_req = (int)$db->query(
+    "SELECT COUNT(*) c FROM leave_requests WHERE member_id=$uid AND status='pending'"
+)->fetch_assoc()['c'];
+
 respond([
-    'my_tasks'    => $my_tasks,
-    'messages'    => $messages,
-    'today_shift' => $today_shift ?: null,
-    'attendance'  => $attendance  ?: null,
+    'my_tasks'         => $my_tasks,
+    'messages'         => $messages,
+    'today_shift'      => $today_shift ?: null,
+    'attendance'       => $attendance  ?: null,
+    'pending_requests' => $my_pending_req,
 ]);
