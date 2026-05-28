@@ -16,6 +16,35 @@ function myDirectorateId($db, $uid) {
 
 // ── GET — fetch tasks (role-scoped) ──────────────────────────────────────
 if ($method === 'GET') {
+    if ($id) {
+        $q = "SELECT t.*,
+                    m.name         AS assigned_name,
+                    m.avatar_color,
+                    d.name         AS directorate_name
+             FROM tasks t
+             LEFT JOIN members      m ON t.assigned_to             = m.id
+             LEFT JOIN directorates d ON t.assigned_directorate_id = d.id
+             WHERE t.id = $id";
+
+        if ($role === 'director') {
+            $myDir = myDirectorateId($db, $uid);
+            $dirClause = $myDir ? "OR t.assigned_directorate_id = $myDir" : '';
+            $q .= " AND (t.assigned_to IN (SELECT id FROM members WHERE director_id = $uid)
+                    OR t.assigned_to = $uid
+                    OR t.created_by = $uid
+                    $dirClause)";
+        } elseif ($role === 'member') {
+            $myDir = myDirectorateId($db, $uid);
+            $dirClause = $myDir ? "OR t.assigned_directorate_id = $myDir" : '';
+            $q .= " AND (t.assigned_to = $uid $dirClause)";
+        }
+
+        $res = $db->query($q);
+        if (!$res) respond(['error' => 'Query failed: ' . $db->error], 500);
+        $row = $res->fetch_assoc();
+        if (!$row) respond(['error' => 'Not found'], 404);
+        respond($row);
+    }
 
     if ($role === 'admin') {
         $res = $db->query(
@@ -70,6 +99,29 @@ if ($method === 'GET') {
 // ── POST — toggle status or create new task ──────────────────────────────
 if ($method === 'POST') {
     $b = body();
+
+    if (isset($b['action']) && $b['action'] === 'update_progress' && $id) {
+        $t = $db->query("SELECT status, assigned_to, assigned_directorate_id, work_plan, closing_note FROM tasks WHERE id = $id")->fetch_assoc();
+        if (!$t) respond(['error' => 'Not found'], 404);
+
+        if ($role === 'member') {
+            $myDir   = myDirectorateId($db, $uid);
+            $allowed = ($t['assigned_to'] == $uid)
+                    || ($myDir && $t['assigned_directorate_id'] == $myDir);
+            if (!$allowed) respond(['error' => 'Forbidden'], 403);
+        }
+
+        $status = in_array($b['status'] ?? '', ['pending','in-progress','completed']) ? $b['status'] : $t['status'];
+        $workPlan = safe($db, $b['work_plan'] ?? $t['work_plan'] ?? '');
+        $closingNote = safe($db, $b['closing_note'] ?? $t['closing_note'] ?? '');
+
+        if ($status === 'completed' && trim($closingNote) === '') {
+            respond(['error' => 'Closing statement is required before marking this task done'], 400);
+        }
+
+        $db->query("UPDATE tasks SET status = '$status', work_plan = '$workPlan', closing_note = '$closingNote' WHERE id = $id");
+        respond(['success' => true, 'status' => $status]);
+    }
 
     // Toggle status
     if (isset($b['toggle']) && $id) {

@@ -64,6 +64,8 @@ CREATE TABLE IF NOT EXISTS tasks (
   due_date              DATE,
   priority              ENUM('low','medium','high') DEFAULT 'medium',
   status                ENUM('pending','in-progress','completed') DEFAULT 'pending',
+  work_plan             TEXT NULL,
+  closing_note          TEXT NULL,
   created_by            INT  NULL,
   created_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (assigned_to)            REFERENCES members(id)      ON DELETE SET NULL,

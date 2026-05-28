@@ -587,6 +587,35 @@ textarea.fg-area:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(92,10
   </div>
 </div>
 
+<!-- TASK DETAIL MODAL -->
+<div class="modal-bg" id="modal-task-detail">
+  <div class="modal">
+    <div class="modal-title" id="task-detail-title">Task details</div>
+    <p id="task-detail-meta" style="font-size:12px;color:var(--text3);margin-top:-6px;margin-bottom:10px"></p>
+    <div class="fg">
+      <label>Status</label>
+      <select id="task-detail-status">
+        <option value="pending">Pending</option>
+        <option value="in-progress">In Progress</option>
+        <option value="completed">Completed</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>What I intend to do</label>
+      <textarea id="task-detail-plan" class="fg-area" placeholder="Describe the work you will carry out on this task"></textarea>
+    </div>
+    <div class="fg">
+      <label>Closing statement (required when marking done)</label>
+      <textarea id="task-detail-close" class="fg-area" placeholder="Summarise what you completed and any next step"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-task-detail')">Close</button>
+      <button class="btn btn-primary" onclick="saveTaskProgress()">Save progress</button>
+      <button class="btn" style="background:var(--green);color:#fff" onclick="markTaskDone()">Mark as done</button>
+    </div>
+  </div>
+</div>
+
 <!-- TASK MODAL -->
 <div class="modal-bg" id="modal-task">
   <div class="modal">
@@ -699,6 +728,7 @@ let lastMsgId        = 0;
 let reviewingReqId   = null;
 let allRequests      = [];
 let reqCurrentFilter = 'all';
+let taskDetailId     = null;
 
 // ── UTILS ─────────────────────────────────────────────────────────────
 const $   = id => document.getElementById(id);
@@ -908,8 +938,8 @@ async function loadDashboard() {
     $('task-prog-bar').style.width = pct + '%';
     $('task-prog-txt').textContent = `${done}/${tasks.length} done`;
     $('dash-tasks').innerHTML = tasks.slice(0, 5).map(t =>
-      `<div class="task-item">
-         <div class="check-circle ${t.status === 'completed' ? 'done' : ''}" onclick="toggleTask(${t.id}, this)"></div>
+      `<div class="task-item" onclick="openTaskDetail(${t.id})" style="cursor:pointer">
+         <div class="check-circle ${t.status === 'completed' ? 'done' : ''}" onclick="event.stopPropagation(); openTaskDetail(${t.id})"></div>
          <div>
            <div class="task-title ${t.status === 'completed' ? 'done' : ''}">${escHtml(t.title)}</div>
            <div class="task-meta">
@@ -944,8 +974,8 @@ async function loadDashboard() {
     if (!tasks) return;
     $('member-tasks-list').innerHTML = tasks.length
       ? tasks.map(t => `
-          <div class="task-item">
-            <div class="check-circle ${t.status === 'completed' ? 'done' : ''}" onclick="toggleTask(${t.id}, this)"></div>
+          <div class="task-item" onclick="openTaskDetail(${t.id})" style="cursor:pointer">
+            <div class="check-circle ${t.status === 'completed' ? 'done' : ''}" onclick="event.stopPropagation(); openTaskDetail(${t.id})"></div>
             <div><div class="task-title ${t.status === 'completed' ? 'done' : ''}">${escHtml(t.title)}</div>
               <div class="task-meta"><span class="dot dot-${t.priority === 'high' ? 'high' : t.priority === 'medium' ? 'med' : 'low'}"></span>${t.priority}${t.due_date ? ' · ' + fmt(t.due_date) : ''}${taskAssignInfo(t)}</div>
             </div>
@@ -968,8 +998,8 @@ async function loadDashboard() {
     if (!tasks) return;
     $('member-tasks-list').innerHTML = tasks.length
       ? tasks.map(t => `
-          <div class="task-item">
-            <div class="check-circle ${t.status === 'completed' ? 'done' : ''}" onclick="toggleTask(${t.id}, this)"></div>
+          <div class="task-item" onclick="openTaskDetail(${t.id})" style="cursor:pointer">
+            <div class="check-circle ${t.status === 'completed' ? 'done' : ''}" onclick="event.stopPropagation(); openTaskDetail(${t.id})"></div>
             <div><div class="task-title ${t.status === 'completed' ? 'done' : ''}">${escHtml(t.title)}</div>
               <div class="task-meta"><span class="dot dot-${t.priority === 'high' ? 'high' : t.priority === 'medium' ? 'med' : 'low'}"></span>${t.priority}${t.due_date ? ' · ' + fmt(t.due_date) : ''}${taskAssignInfo(t)}</div>
             </div>
@@ -1193,8 +1223,8 @@ async function deleteShift(id) {
 async function loadTasks() {
   const tasks = await api('tasks.php') || [];
   $('tasks-list').innerHTML = tasks.length ? tasks.map(t =>
-    `<div class="task-item">
-       <div class="check-circle ${t.status === 'completed' ? 'done' : ''}" onclick="toggleTask(${t.id}, this)"></div>
+    `<div class="task-item" onclick="openTaskDetail(${t.id})" style="cursor:pointer">
+       <div class="check-circle ${t.status === 'completed' ? 'done' : ''}" onclick="event.stopPropagation(); openTaskDetail(${t.id})"></div>
        <div style="flex:1">
          <div class="task-title ${t.status === 'completed' ? 'done' : ''}">${escHtml(t.title)}</div>
          <div class="task-meta">
@@ -1240,6 +1270,44 @@ async function saveTask() {
     return toast('Please select a directorate', 'err');
   await api('tasks.php', { method: 'POST', body });
   toast('Task created'); closeModal('modal-task'); loadTasks();
+}
+
+async function openTaskDetail(id) {
+  const task = await api(`tasks.php?id=${id}`);
+  if (!task) return;
+  taskDetailId = id;
+  $('task-detail-title').textContent = task.title || 'Task details';
+  $('task-detail-meta').textContent = `${task.priority || 'medium'} priority${task.due_date ? ' · due ' + fmt(task.due_date) : ''}${task.assigned_name ? ' · ' + task.assigned_name : ''}`;
+  $('task-detail-status').value = task.status || 'pending';
+  $('task-detail-plan').value = task.work_plan || '';
+  $('task-detail-close').value = task.closing_note || '';
+  openModal('modal-task-detail');
+}
+
+async function saveTaskProgress() {
+  if (!taskDetailId) return;
+  const status = $('task-detail-status').value;
+  const workPlan = $('task-detail-plan').value.trim();
+  const closingNote = $('task-detail-close').value.trim();
+  if (status === 'completed' && !closingNote) return toast('Closing statement is required before marking this task done.', 'err');
+  const res = await api(`tasks.php?id=${taskDetailId}`, { method: 'POST', body: { action: 'update_progress', status, work_plan: workPlan, closing_note: closingNote } });
+  if (!res) return;
+  toast(status === 'completed' ? 'Task marked done' : 'Task updated');
+  closeModal('modal-task-detail');
+  loadTasks();
+  loadDashboard();
+}
+
+async function markTaskDone() {
+  if (!taskDetailId) return;
+  const closingNote = $('task-detail-close').value.trim();
+  if (!closingNote) return toast('Closing statement is required before marking this task done.', 'err');
+  const res = await api(`tasks.php?id=${taskDetailId}`, { method: 'POST', body: { action: 'update_progress', status: 'completed', work_plan: $('task-detail-plan').value.trim(), closing_note: closingNote } });
+  if (!res) return;
+  toast('Task marked done');
+  closeModal('modal-task-detail');
+  loadTasks();
+  loadDashboard();
 }
 
 async function toggleTask(id, el) {
