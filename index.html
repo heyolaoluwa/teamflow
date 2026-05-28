@@ -156,6 +156,11 @@ nav{padding:12px 10px;flex:1;overflow-y:auto}
 .msg.me .msg-meta{text-align:right}
 .msg-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;color:var(--text3);font-size:13px;gap:10px;padding:40px 20px;animation:fadeUp .4s ease}
 .msg-empty svg{opacity:.25}
+.mention-chip{display:inline-block;background:var(--brand-light);color:var(--brand-dark);padding:1px 6px;border-radius:999px;font-weight:600}
+.notif-card{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.notif-card:last-child{border-bottom:none}
+.notif-icon{width:32px;height:32px;border-radius:10px;background:var(--brand-light);display:flex;align-items:center;justify-content:center;color:var(--brand-dark);font-size:13px;font-weight:700;flex-shrink:0}
+.notif-card.unread{background:linear-gradient(90deg, rgba(92,107,192,.06), transparent)}
 .msg-bar{display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--border);flex-shrink:0;align-items:center}
 .msg-input{flex:1;border:1px solid var(--border);border-radius:22px;padding:9px 16px;font-size:13.5px;font-family:'Inter',sans-serif;color:var(--text);outline:none;background:var(--bg);transition:border .15s,background .15s,box-shadow .15s}
 .msg-input:focus{border-color:var(--brand);background:var(--white);box-shadow:0 0 0 3px rgba(92,107,192,.1)}
@@ -299,6 +304,11 @@ textarea.fg-area:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(92,10
       <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
       <span class="nav-label">Messages</span>
       <span class="nav-badge" id="msg-nav-badge">0</span>
+    </div>
+    <div class="nav-item" data-page="notifications" data-roles="admin director member">
+      <svg viewBox="0 0 24 24"><path d="M15 17H4a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2z"/><path d="M15 17l3 3 3-3"/></svg>
+      <span class="nav-label">Notifications</span>
+      <span class="nav-badge" id="notif-nav-badge">0</span>
     </div>
     <div class="nav-item" data-page="directorates" data-roles="admin" id="nav-directorates">
       <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -477,6 +487,14 @@ textarea.fg-area:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(92,10
             <svg viewBox="0 0 24 24" width="15" height="15"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="page" id="page-notifications">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Notifications</span><button class="btn btn-ghost btn-sm" onclick="markNotificationsRead()">Mark all read</button></div>
+        <div id="notifications-list"></div>
       </div>
     </div>
 
@@ -794,6 +812,11 @@ function statusBadge(s) {
   return `<span class="badge badge-${map[s] || 'gray'}">${s}</span>`;
 }
 
+function renderMessageText(text) {
+  const escaped = escHtml(text || '');
+  return escaped.replace(/@([A-Za-z][A-Za-z0-9_\- ]{1,40})/g, '<span class="mention-chip">@$1</span>');
+}
+
 // ── MOBILE SIDEBAR ─────────────────────────────────────────────────────
 function toggleSidebar() {
   const sb = $('main-sidebar');
@@ -816,6 +839,7 @@ async function init() {
     if (auth.user.must_change_password) { window.location.href = 'login.html?change=1'; return; }
     currentUser = auth.user;
     setupUI();
+    await refreshNotificationBadge();
     loadDashboard();
   } catch (e) {
     window.location.href = 'login.html';
@@ -856,7 +880,7 @@ function switchPage(name) {
     dashboard: 'Dashboard',
     members: currentUser?.user_role === 'director' ? 'My Team' : 'Members',
     shifts: 'Schedule', tasks: 'Tasks', attendance: 'Attendance',
-    messages: 'Messages', directorates: 'Directorates', requests: 'Requests'
+    messages: 'Messages', notifications: 'Notifications', directorates: 'Directorates', requests: 'Requests'
   }[name] || name;
   $('member-search').style.display = name === 'members' ? 'block' : 'none';
   const actionLabels = {
@@ -880,6 +904,7 @@ function switchPage(name) {
   $('action-btn').style.display = canSeeBtn ? '' : 'none';
   if (lbl) $('action-label').textContent = lbl;
   if (name === 'messages') startMsgPolling();
+  else if (name === 'notifications') loadNotifications();
   else loaders[name]?.();
 }
 
@@ -897,6 +922,8 @@ async function loadDashboard() {
   const s    = await api('dashboard.php');
   if (!s) return;
   const role = currentUser.user_role;
+
+  await refreshNotificationBadge();
 
   // Requests nav badge (works for all roles — scoped server-side)
   const reqBadge = $('req-nav-badge');
@@ -1367,7 +1394,7 @@ async function loadMessages(scrollToBottom) {
         return `<div class="msg ${isMe ? 'me' : 'them'}" style="animation-delay:${Math.min(i * 0.025, 0.35)}s">
           ${!isMe ? `<div class="av av-sm" style="background:${color}">${initials(m.sender_name)}</div>` : ''}
           <div>
-            <div class="bubble">${escHtml(m.content)}</div>
+            <div class="bubble">${renderMessageText(m.content)}</div>
             <div class="msg-meta">${!isMe ? escHtml(m.sender_name) + ' · ' : ''}${time}</div>
           </div>
         </div>`;
@@ -1401,6 +1428,41 @@ function startMsgPolling() {
 
 function stopMsgPolling() {
   if (msgPollTimer) { clearInterval(msgPollTimer); msgPollTimer = null; }
+}
+
+async function refreshNotificationBadge() {
+  try {
+    const data = await api('notifications.php?action=count');
+    const count = Number(data?.count || 0);
+    const badge = $('notif-nav-badge');
+    badge.textContent = count > 9 ? '9+' : count;
+    badge.classList.toggle('show', count > 0);
+  } catch (_) {}
+}
+
+async function loadNotifications() {
+  try {
+    const rows = await api('notifications.php') || [];
+    const list = $('notifications-list');
+    list.innerHTML = rows.length ? rows.map(n => `
+      <div class="notif-card ${n.is_read ? '' : 'unread'}">
+        <div class="notif-icon">${(n.type || 'N').charAt(0).toUpperCase()}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">
+            <strong style="font-size:13px">${escHtml(n.title || 'Notification')}</strong>
+            <span style="font-size:11px;color:var(--text3)">${fmtDT(n.created_at)}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text2);margin-top:4px">${escHtml(n.body || '')}</div>
+        </div>
+      </div>
+    `).join('') : '<div style="color:var(--text3);font-size:13px;padding:16px 0">No notifications yet.</div>';
+    await refreshNotificationBadge();
+  } catch (_) {}
+}
+
+async function markNotificationsRead() {
+  await api('notifications.php', { method: 'POST', body: { action: 'mark_read' } });
+  await loadNotifications();
 }
 
 async function sendMsg() {
@@ -1713,6 +1775,7 @@ const loaders = {
   tasks:        loadTasks,
   attendance:   loadAttendance,
   messages:     startMsgPolling,
+  notifications: loadNotifications,
   directorates: loadDirectorates,
   requests:     loadRequests
 };

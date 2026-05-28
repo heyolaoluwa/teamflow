@@ -14,6 +14,23 @@ function myDirectorateId($db, $uid) {
     return ($r && $r['directorate_id']) ? (int)$r['directorate_id'] : 0;
 }
 
+function notifyUser($db, $userId, $type, $title, $body, $link = '') {
+    if (!$userId) return;
+    $title = safe($db, $title);
+    $body  = safe($db, $body);
+    $link  = safe($db, $link);
+    $db->query("INSERT INTO notifications (user_id, type, title, body, link) VALUES ($userId, '$type', '$title', '$body', '$link')");
+}
+
+function notifyDirectorateMembers($db, $directorateId, $type, $title, $body, $link = '') {
+    if (!$directorateId) return;
+    $res = $db->query("SELECT id FROM members WHERE directorate_id=$directorateId AND status!='inactive'");
+    if (!$res) return;
+    while ($row = $res->fetch_assoc()) {
+        notifyUser($db, (int)$row['id'], $type, $title, $body, $link);
+    }
+}
+
 // ── GET — fetch tasks (role-scoped) ──────────────────────────────────────
 if ($method === 'GET') {
     if ($id) {
@@ -163,7 +180,16 @@ if ($method === 'POST') {
              ('$title', $asgn_to, $asgn_dir, $due_val, '$priority', '$status', $uid)"
     );
     if (!$ok) respond(['error' => 'Insert failed: ' . $db->error], 500);
-    respond(['success' => true, 'id' => $db->insert_id], 201);
+
+    $taskId = (int)$db->insert_id;
+    if ($asgn_to !== 'NULL') {
+        notifyUser($db, (int)$b['assigned_to'], 'task', 'New task assigned', "You were assigned: $title", "tasks.php?id=$taskId");
+    }
+    if ($asgn_dir !== 'NULL') {
+        notifyDirectorateMembers($db, (int)$b['assigned_directorate_id'], 'task', 'New task for your directorate', "A new task was assigned to your directorate: $title", "tasks.php?id=$taskId");
+    }
+
+    respond(['success' => true, 'id' => $taskId], 201);
 }
 
 // ── DELETE ───────────────────────────────────────────────────────────────
