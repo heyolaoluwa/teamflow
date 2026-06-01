@@ -85,14 +85,19 @@ CREATE TABLE IF NOT EXISTS messages (
 
 -- 7. Attendance
 CREATE TABLE IF NOT EXISTS attendance (
-  id           INT AUTO_INCREMENT PRIMARY KEY,
-  member_id    INT      NOT NULL,
-  clock_in     DATETIME NOT NULL,
-  clock_out    DATETIME NULL,
-  work_minutes INT      NULL,
-  date         DATE     NOT NULL,
+  id               INT AUTO_INCREMENT PRIMARY KEY,
+  member_id        INT      NOT NULL,
+  clock_in         DATETIME NOT NULL,
+  clock_out        DATETIME NULL,
+  work_minutes     INT      NULL,
+  date             DATE     NOT NULL,
+  task_note        TEXT     NULL,
+  achievement_note TEXT     NULL,
   FOREIGN KEY (member_id) REFERENCES members(id) ON DELETE CASCADE
 );
+
+-- Run this on existing databases to add the note columns:
+-- ALTER TABLE attendance ADD COLUMN task_note TEXT NULL, ADD COLUMN achievement_note TEXT NULL;
 
 -- 8. Leave / Break Requests
 CREATE TABLE IF NOT EXISTS leave_requests (

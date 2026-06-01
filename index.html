@@ -468,7 +468,7 @@ textarea.fg-area:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(92,10
         <div class="tbl-wrap">
           <table class="tbl">
             <thead>
-              <tr><th>Member</th><th>Clock In</th><th>Clock Out</th><th>Duration</th><th>Status</th></tr>
+              <tr><th>Member</th><th>Clock In</th><th>Clock Out</th><th>Duration</th><th>Status</th><th>Today's Focus</th><th>Accomplishments</th></tr>
             </thead>
             <tbody id="att-body">
               <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text3)">Loading…</td></tr>
@@ -1183,6 +1183,7 @@ function submitTaskToday() {
   closeModal('modal-task-today');
   _resumeClockAfterModal();
   toast(`Focus set: "${plan.substring(0, 50)}${plan.length > 50 ? '…' : ''}"`);
+  api('attendance.php?action=save_task_note', { method: 'POST', body: { note: plan } });
 }
 
 function _resumeClockAfterModal() {
@@ -1216,7 +1217,7 @@ async function confirmClockOut() {
   }
   clockPaused = false;
   clockOutModalPausedTimer = false;
-  const r = await api('attendance.php?action=clock_out', { method: 'POST' });
+  const r = await api('attendance.php?action=clock_out', { method: 'POST', body: { achievement_note: achieved } });
   if (!r) return;
   isClockedIn = false; clockInTime = null; pausedMs = 0;
   $('clock-summary').textContent = `Today: ${fmtDur(r.work_minutes)} worked`;
@@ -1492,15 +1493,20 @@ async function loadAttendance() {
     const active = r.clock_in && !r.clock_out;
     const badge  = r.clock_out ? 'badge-green' : (active ? 'badge-amber' : 'badge-gray');
     const label  = r.clock_out ? 'Completed' : (active ? 'Working' : 'Absent');
+    const noteCell = note => note
+      ? `<span title="${escHtml(note)}" style="cursor:default">${escHtml(note.length > 45 ? note.substring(0, 45) + '…' : note)}</span>`
+      : `<span style="color:var(--text3)">—</span>`;
     return `<tr class="table-row">
       <td><div class="name-cell">${av(r.member_name, r.avatar_color, 'av-sm')} ${escHtml(r.member_name)}</div></td>
       <td>${fmtDT(r.clock_in)}</td>
       <td>${fmtDT(r.clock_out)}</td>
       <td>${active ? '<span style="color:var(--amber)">In progress</span>' : fmtDur(r.work_minutes)}</td>
       <td><span class="badge ${badge}">${label}</span></td>
+      <td style="max-width:200px;font-size:12px">${noteCell(r.task_note)}</td>
+      <td style="max-width:200px;font-size:12px">${noteCell(r.achievement_note)}</td>
     </tr>`;
   }).join('')
-  : `<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text3)">No attendance records for this date</td></tr>`;
+  : `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text3)">No attendance records for this date</td></tr>`;
 }
 
 // ── MESSAGES ───────────────────────────────────────────────────────────

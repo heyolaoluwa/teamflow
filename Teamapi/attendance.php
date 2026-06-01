@@ -17,13 +17,27 @@ if ($method === 'POST' && $action === 'clock_in') {
     respond(['success' => true, 'clock_in' => date('Y-m-d H:i:s')]);
 }
 
+// SAVE TASK NOTE (posted 30s after clock-in when member submits focus modal)
+if ($method === 'POST' && $action === 'save_task_note') {
+    $body = json_decode(file_get_contents('php://input'), true);
+    $note = safe($db, trim($body['note'] ?? ''));
+    if ($note === '') respond(['error' => 'Note is required'], 400);
+    $today = date('Y-m-d');
+    $rec   = $db->query("SELECT id FROM attendance WHERE member_id=$uid AND date='$today' AND clock_out IS NULL ORDER BY id DESC LIMIT 1")->fetch_assoc();
+    if (!$rec) respond(['error' => 'No active clock-in found'], 400);
+    $db->query("UPDATE attendance SET task_note='$note' WHERE id={$rec['id']}");
+    respond(['success' => true]);
+}
+
 // CLOCK OUT
 if ($method === 'POST' && $action === 'clock_out') {
-    $today = date('Y-m-d');
-    $rec   = $db->query("SELECT id, clock_in FROM attendance WHERE member_id=$uid AND date='$today' AND clock_out IS NULL")->fetch_assoc();
+    $body    = json_decode(file_get_contents('php://input'), true);
+    $achNote = safe($db, trim($body['achievement_note'] ?? ''));
+    $today   = date('Y-m-d');
+    $rec     = $db->query("SELECT id, clock_in FROM attendance WHERE member_id=$uid AND date='$today' AND clock_out IS NULL")->fetch_assoc();
     if (!$rec) respond(['error' => 'Not clocked in'], 400);
     $mins = max(1, (int)round((time() - strtotime($rec['clock_in'])) / 60));
-    $db->query("UPDATE attendance SET clock_out=NOW(), work_minutes=$mins WHERE id={$rec['id']}");
+    $db->query("UPDATE attendance SET clock_out=NOW(), work_minutes=$mins, achievement_note='$achNote' WHERE id={$rec['id']}");
     respond(['success' => true, 'work_minutes' => $mins]);
 }
 
