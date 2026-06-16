@@ -1,24 +1,52 @@
 <?php
 ini_set('display_errors', 0);
-set_error_handler(function($errno, $errstr, $errfile, $errline) {
-    http_response_code(500);
-    echo json_encode(['error' => "$errstr in $errfile line $errline"]);
-    exit();
-});
-set_exception_handler(function($e) {
-    http_response_code(500);
-    echo json_encode(['error' => $e->getMessage() . ' in ' . $e->getFile() . ' line ' . $e->getLine()]);
-    exit();
-});
-register_shutdown_function(function() {
-    $e = error_get_last();
-    if ($e && in_array($e['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR])) {
-        if (!headers_sent()) { header('Content-Type: application/json'); http_response_code(500); }
-        echo json_encode(['error' => $e['message'] . ' in ' . $e['file'] . ' line ' . $e['line']]);
+function send_http_status($code) {
+    if (function_exists('http_response_code')) {
+        http_response_code($code);
+        return;
     }
-});
+    if (!headers_sent()) {
+        $protocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+        $text = $code === 500 ? 'Internal Server Error' : ($code === 400 ? 'Bad Request' : 'OK');
+        header($protocol . ' ' . $code . ' ' . $text, true, $code);
+    }
+}
+function handle_error($errno, $errstr, $errfile, $errline) {
+    if (!(error_reporting() & $errno)) {
+        return false;
+    }
+    if (!headers_sent()) {
+        header('Content-Type: application/json');
+    }
+    send_http_status(500);
+    echo json_encode(array('error' => "$errstr in $errfile line $errline"));
+    exit();
+}
+function handle_exception($e) {
+    if (!headers_sent()) {
+        header('Content-Type: application/json');
+    }
+    send_http_status(500);
+    echo json_encode(array('error' => $e->getMessage() . ' in ' . $e->getFile() . ' line ' . $e->getLine()));
+    exit();
+}
+function handle_shutdown() {
+    $e = error_get_last();
+    if ($e && in_array($e['type'], array(E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR))) {
+        if (!headers_sent()) {
+            header('Content-Type: application/json');
+            send_http_status(500);
+        }
+        echo json_encode(array('error' => $e['message'] . ' in ' . $e['file'] . ' line ' . $e['line']));
+    }
+}
+set_error_handler('handle_error');
+set_exception_handler('handle_exception');
+register_shutdown_function('handle_shutdown');
 
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 define('DB_HOST', 'localhost');
 define('DB_USER', 'siuxgjee_teamflow');
@@ -65,5 +93,5 @@ function body() {
 }
 
 function safe($conn, $val) {
-    return $conn->real_escape_string($val ?? '');
+    return $conn->real_escape_string(isset($val) ? $val : '');
 }

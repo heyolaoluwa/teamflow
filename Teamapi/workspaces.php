@@ -9,11 +9,22 @@ function genTempPassword() {
     $lower  = 'abcdefghijkmnpqrstuvwxyz';
     $digits = '23456789';
     $all    = $upper . $lower . $digits;
-    $pass   = $upper[random_int(0, strlen($upper)-1)]
-            . $lower[random_int(0, strlen($lower)-1)]
-            . $digits[random_int(0, strlen($digits)-1)];
-    for ($i = 0; $i < 7; $i++) $pass .= $all[random_int(0, strlen($all)-1)];
+    $pass   = $upper[rand(0, strlen($upper)-1)]
+            . $lower[rand(0, strlen($lower)-1)]
+            . $digits[rand(0, strlen($digits)-1)];
+    for ($i = 0; $i < 7; $i++) {
+        $pass .= $all[rand(0, strlen($all)-1)];
+    }
     return str_shuffle($pass);
+}
+function getRandomHex($length = 12) {
+    if (function_exists('random_bytes')) {
+        return bin2hex(random_bytes((int)ceil($length / 2)));
+    }
+    if (function_exists('openssl_random_pseudo_bytes')) {
+        return bin2hex(openssl_random_pseudo_bytes((int)ceil($length / 2)));
+    }
+    return substr(md5(uniqid('', true)), 0, $length);
 }
 
 if ($method === 'GET') {
@@ -30,16 +41,17 @@ if ($method === 'GET') {
 
 if ($method === 'POST') {
     $b          = body();
-    $name       = safe($db, trim($b['name'] ?? ''));
-    $admin_name = safe($db, trim($b['admin_name'] ?? ''));
-    $admin_email= safe($db, trim($b['admin_email'] ?? ''));
-    if (!$name) respond(['error' => 'Workspace name required'], 400);
-    if (!$admin_name || !$admin_email) respond(['error' => 'Admin name and email required'], 400);
-    if ($db->query("SELECT id FROM members WHERE email = '$admin_email'")->num_rows > 0)
-        respond(['error' => 'Email already in use'], 400);
+    $name       = safe($db, trim(isset($b['name']) ? $b['name'] : ''));
+    $admin_name = safe($db, trim(isset($b['admin_name']) ? $b['admin_name'] : ''));
+    $admin_email= safe($db, trim(isset($b['admin_email']) ? $b['admin_email'] : ''));
+    if (!$name) respond(array('error' => 'Workspace name required'), 400);
+    if (!$admin_name || !$admin_email) respond(array('error' => 'Admin name and email required'), 400);
+    if ($db->query("SELECT id FROM members WHERE email = '$admin_email'")->num_rows > 0) {
+        respond(array('error' => 'Email already in use'), 400);
+    }
 
-    $desc      = safe($db, $b['description'] ?? '');
-    $logo_url  = safe($db, $b['logo_url'] ?? '');
+    $desc      = safe($db, isset($b['description']) ? $b['description'] : '');
+    $logo_url  = safe($db, isset($b['logo_url']) ? $b['logo_url'] : '');
 
     if (empty($logo_url) && isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
         $allowedTypes = [
@@ -71,7 +83,7 @@ if ($method === 'POST') {
             mkdir($uploadDir, 0755, true);
         }
 
-        $filename = 'workspace-logo-' . time() . '-' . bin2hex(random_bytes(6)) . '.' . $allowedTypes[$mimeType];
+        $filename = 'workspace-logo-' . time() . '-' . getRandomHex(12) . '.' . $allowedTypes[$mimeType];
         $destPath = $uploadDir . '/' . $filename;
         if (!move_uploaded_file($tmpPath, $destPath)) {
             respond(['error' => 'Unable to save workspace logo'], 500);
@@ -120,10 +132,10 @@ if ($method === 'PUT' && $id) {
     if ($role !== 'admin' && $existing['created_by'] != $uid) respond(['error' => 'Forbidden'], 403);
 
     $b    = body();
-    $name = safe($db, trim($b['name'] ?? ''));
-    if (!$name) respond(['error' => 'Name required'], 400);
-    $desc = safe($db, $b['description'] ?? '');
-    $logo = safe($db, $b['logo_url'] ?? '');
+    $name = safe($db, trim(isset($b['name']) ? $b['name'] : ''));
+    if (!$name) respond(array('error' => 'Name required'), 400);
+    $desc = safe($db, isset($b['description']) ? $b['description'] : '');
+    $logo = safe($db, isset($b['logo_url']) ? $b['logo_url'] : '');
 
     $db->query("UPDATE workspaces SET name='$name', description='$desc', logo_url='$logo' WHERE id=$id");
     respond(['success' => true]);
