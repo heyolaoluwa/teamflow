@@ -23,9 +23,11 @@ function genTempPassword() {
 if ($method === 'GET' && isset($_GET['id'])) {
     $id = (int)$_GET['id'];
     $r  = $db->query(
-        "SELECT id, name, email, role, user_role, department, employment_type, status,
-                phone, avatar_color, director_id, directorate_id, last_login
-         FROM members WHERE id = $id"
+        "SELECT m.id, m.name, m.email, m.role, m.user_role, m.department, m.employment_type, m.status,
+                m.phone, m.avatar_color, m.director_id, m.directorate_id, m.workspace_id, w.name AS workspace_name, m.last_login
+         FROM members m
+         LEFT JOIN workspaces w ON m.workspace_id = w.id
+         WHERE m.id = $id"
     )->fetch_assoc();
     if (!$r) respond(['error' => 'Not found'], 404);
     if ($role !== 'admin' && $r['id'] !== $uid && $r['director_id'] !== $uid)
@@ -48,9 +50,11 @@ if ($method === 'GET') {
     } elseif ($role === 'member') $where .= " AND id = $uid";
 
     $rows = $db->query(
-        "SELECT id, name, email, role, user_role, department, employment_type, status,
-                phone, avatar_color, director_id, directorate_id, last_login
-         FROM members WHERE $where
+        "SELECT m.id, m.name, m.email, m.role, m.user_role, m.department, m.employment_type, m.status,
+                m.phone, m.avatar_color, m.director_id, m.directorate_id, m.workspace_id, w.name AS workspace_name, m.last_login
+         FROM members m
+         LEFT JOIN workspaces w ON m.workspace_id = w.id
+         WHERE $where
          ORDER BY FIELD(user_role,'admin','director','member'), name ASC"
     )->fetch_all(MYSQLI_ASSOC);
     respond($rows);
@@ -73,8 +77,9 @@ if ($method === 'POST') {
     $emp        = in_array($b['employment_type'] ?? '', ['full-time','part-time','contractor']) ? $b['employment_type'] : 'full-time';
     $stat       = in_array($b['status'] ?? '', ['active','on-leave','inactive']) ? $b['status'] : 'active';
     $phone      = safe($db, $b['phone'] ?? '');
-    $dir_id     = !empty($b['director_id'])    ? (int)$b['director_id']    : 'NULL';
-    $dirate_id  = !empty($b['directorate_id']) ? (int)$b['directorate_id'] : 'NULL';
+    $dir_id      = !empty($b['director_id'])    ? (int)$b['director_id']    : 'NULL';
+    $dirate_id   = !empty($b['directorate_id']) ? (int)$b['directorate_id'] : 'NULL';
+    $workspace_id = !empty($b['workspace_id']) ? (int)$b['workspace_id'] : 'NULL';
 
     $temp   = genTempPassword();
     $hash   = safe($db, password_hash($temp, PASSWORD_BCRYPT));
@@ -86,10 +91,10 @@ if ($method === 'POST') {
         "INSERT INTO members
              (name, email, role, user_role, department, employment_type, status, phone,
               avatar_color, password_hash, temp_password, must_change_password,
-              director_id, directorate_id)
+              director_id, directorate_id, workspace_id)
          VALUES
              ('$name','$email','$job_role','$user_role','$dept','$emp','$stat','$phone',
-              '$color','$hash','$tsafe', 1, $dir_id, $dirate_id)"
+              '$color','$hash','$tsafe', 1, $dir_id, $dirate_id, $workspace_id)"
     );
 
     respond(['success' => true, 'id' => $db->insert_id, 'temp_password' => $temp, 'email' => $b['email']]);
@@ -112,12 +117,14 @@ if ($method === 'PUT') {
     $set   = "name='$name', email='$email', role='$jrole', department='$dept', phone='$phone', employment_type='$emp', status='$stat'";
 
     if ($role === 'admin') {
-        $urole     = in_array($b['user_role'] ?? '', ['member','director','admin']) ? $b['user_role'] : null;
-        $dir       = isset($b['director_id'])    ? (!empty($b['director_id'])    ? (int)$b['director_id']    : 'NULL') : null;
-        $dirate_id = isset($b['directorate_id']) ? (!empty($b['directorate_id']) ? (int)$b['directorate_id'] : 'NULL') : null;
-        if ($urole !== null)      $set .= ", user_role='$urole'";
-        if ($dir !== null)        $set .= ", director_id=$dir";
-        if ($dirate_id !== null)  $set .= ", directorate_id=$dirate_id";
+        $urole       = in_array($b['user_role'] ?? '', ['member','director','admin']) ? $b['user_role'] : null;
+        $dir         = isset($b['director_id'])    ? (!empty($b['director_id'])    ? (int)$b['director_id']    : 'NULL') : null;
+        $dirate_id   = isset($b['directorate_id']) ? (!empty($b['directorate_id']) ? (int)$b['directorate_id'] : 'NULL') : null;
+        $workspace_id = isset($b['workspace_id']) ? (!empty($b['workspace_id']) ? (int)$b['workspace_id'] : 'NULL') : null;
+        if ($urole !== null)       $set .= ", user_role='$urole'";
+        if ($dir !== null)         $set .= ", director_id=$dir";
+        if ($dirate_id !== null)   $set .= ", directorate_id=$dirate_id";
+        if ($workspace_id !== null) $set .= ", workspace_id=$workspace_id";
     }
     $db->query("UPDATE members SET $set WHERE id = $id");
     respond(['success' => true]);

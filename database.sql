@@ -2,7 +2,16 @@
 -- Run in cPanel > phpMyAdmin > select database > SQL tab
 -- FRESH install: paste all and click Go
 
--- 1. Directorates (must come first — members references it)
+-- 1. Workspaces
+CREATE TABLE IF NOT EXISTS workspaces (
+  id          INT AUTO_INCREMENT PRIMARY KEY,
+  name        VARCHAR(100)  NOT NULL,
+  description VARCHAR(255)  DEFAULT '',
+  created_by  INT           NULL,
+  created_at  TIMESTAMP     DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2. Directorates (must come first — members references it)
 CREATE TABLE IF NOT EXISTS directorates (
   id          INT AUTO_INCREMENT PRIMARY KEY,
   name        VARCHAR(100)  NOT NULL,
@@ -12,7 +21,7 @@ CREATE TABLE IF NOT EXISTS directorates (
   created_at  TIMESTAMP     DEFAULT CURRENT_TIMESTAMP
 );
 
--- 2. Members
+-- 3. Members
 CREATE TABLE IF NOT EXISTS members (
   id                   INT AUTO_INCREMENT PRIMARY KEY,
   name                 VARCHAR(100)  NOT NULL,
@@ -29,10 +38,12 @@ CREATE TABLE IF NOT EXISTS members (
   must_change_password TINYINT(1)   DEFAULT 1,
   director_id          INT          NULL,
   directorate_id       INT          NULL,
+  workspace_id         INT          NULL,
   last_login           TIMESTAMP    NULL,
   created_at           TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (director_id)    REFERENCES members(id)     ON DELETE SET NULL,
-  FOREIGN KEY (directorate_id) REFERENCES directorates(id) ON DELETE SET NULL
+  FOREIGN KEY (directorate_id) REFERENCES directorates(id) ON DELETE SET NULL,
+  FOREIGN KEY (workspace_id)   REFERENCES workspaces(id) ON DELETE SET NULL
 );
 
 -- 3. Add the circular FK: directorates.director_id → members.id
@@ -43,6 +54,10 @@ ALTER TABLE directorates
 ALTER TABLE directorates
   ADD CONSTRAINT fk_directorate_created_by
   FOREIGN KEY (created_by)  REFERENCES members(id) ON DELETE SET NULL;
+
+ALTER TABLE workspaces
+  ADD CONSTRAINT fk_workspace_created_by
+  FOREIGN KEY (created_by) REFERENCES members(id) ON DELETE SET NULL;
 
 -- 4. Shifts
 CREATE TABLE IF NOT EXISTS shifts (
