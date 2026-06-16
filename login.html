@@ -124,7 +124,7 @@ async function doLogin() {
     document.getElementById('screen-login').classList.remove('active');
     document.getElementById('screen-change').classList.add('active');
   } else {
-    window.location.href = 'index.html';
+    window.location.href = 'app.html';
   }
 }
 
@@ -141,7 +141,7 @@ async function doChangePassword() {
   setLoading('change-btn', false);
 
   if (data.error) { showErr('change-err', data.error); return; }
-  window.location.href = 'index.html';
+  window.location.href = 'app.html';
 }
 
 function checkStrength(val) {
@@ -174,7 +174,7 @@ if (new URLSearchParams(location.search).get('change') === '1') {
 
 // Auto-redirect if already logged in
 call('auth.php?action=check').then(d => {
-  if (d.logged_in && !d.user.must_change_password) window.location.href = 'index.html';
+  if (d.logged_in && !d.user.must_change_password) window.location.href = 'app.html';
 }).catch(() => {});
 </script>
 </body>

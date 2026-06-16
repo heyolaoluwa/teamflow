@@ -9,7 +9,7 @@ $existing = $db->query("SELECT COUNT(*) c FROM members WHERE user_role='admin'")
 if ($existing > 0) {
     echo '<p style="font-family:sans-serif;color:#c0392b;padding:24px">
             <strong>Setup already completed.</strong> Admin account exists.<br>
-            <a href="../index.html">Go to app</a>
+            <a href="../app.html">Go to app</a>
           </p>';
     exit();
 }
@@ -50,6 +50,6 @@ echo '<!DOCTYPE html><html><head>
     <p><b>Password:</b> Admin@TeamFlow1</p>
   </div>
   <p class="warn"><strong>Important:</strong> Log in and change your password immediately. Then delete this file (<code>Teamapi/setup.php</code>) from cPanel.</p>
-  <a href="../index.html">Go to Login</a>
+  <a href="../login.html">Go to Login</a>
 </div>
 </body></html>';

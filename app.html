@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TeamFlow</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --brand:#5C6BC0;--brand-dark:#3949AB;--brand-light:#E8EAF6;
+  --bg:#F5F6FA;--white:#fff;--surface:#fff;
+  --border:#E4E6EF;--border2:#C5CAE9;
+  --text:#1A1D2E;--text2:#6B7280;--text3:#9CA3AF;
+  --green:#10B981;--green-bg:#D1FAE5;
+  --amber:#F59E0B;--amber-bg:#FEF3C7;
+  --red:#EF4444;--red-bg:#FEE2E2;
+  --blue:#3B82F6;--blue-bg:#DBEAFE;
+  --radius:10px;--radius-sm:6px;
+}
+
+/* ── BASE ──────────────────────────────────────────────────────────────── */
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;height:100vh;overflow:hidden;display:flex}
+
+/* ── SIDEBAR ─────────────────────────────────────────────────────────── */
+.sidebar{width:210px;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.logo{display:flex;align-items:center;gap:10px;padding:20px 18px;border-bottom:1px solid var(--border)}
+.logo-box{width:32px;height:32px;border-radius:8px;object-fit:contain;flex-shrink:0}
+.logo-text{font-size:16px;font-weight:600}
+nav{padding:12px 10px;flex:1;overflow-y:auto}
+.nav-item{position:relative;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);color:var(--text2);cursor:pointer;font-size:13.5px;font-weight:500;margin-bottom:2px;transition:all .18s cubic-bezier(.4,0,.2,1);-webkit-user-select:none;user-select:none}
+.nav-item:hover{background:var(--bg);color:var(--text);transform:translateX(2px)}
+.nav-item.active{background:var(--brand-light);color:var(--brand-dark)}
+.nav-item svg{width:16px;height:16px;flex-shrink:0;transition:transform .18s}
+.nav-item:hover svg{transform:scale(1.12)}
+.nav-label{flex:1}
+.nav-badge{position:absolute;top:7px;right:10px;background:var(--red);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:none;align-items:center;justify-content:center;padding:0 4px;animation:badgePop .3s cubic-bezier(.34,1.56,.64,1)}
+.nav-badge.show{display:flex}
+.sidebar-footer{padding:14px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.user-av{width:32px;height:32px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;transition:transform .2s}
+.user-av:hover{transform:scale(1.08)}
+.user-info{flex:1;min-width:0}
+.user-info .name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-info .urole{font-size:11px;color:var(--text3)}
+.logout-btn{background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;border-radius:4px;display:flex;align-items:center;transition:all .15s}
+.logout-btn:hover{color:var(--red);background:var(--red-bg)}
+
+/* ── SIDEBAR OVERLAY (mobile) ────────────────────────────────────────── */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:90;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+.sidebar-overlay.show{display:block;animation:fadeIn .2s ease}
+
+/* ── MAIN ────────────────────────────────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px}
+.topbar-left{display:flex;align-items:center;gap:10px;min-width:0}
+.page-title{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.hamburger{display:none;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;padding:7px;border-radius:var(--radius-sm);color:var(--text2);transition:all .15s;flex-shrink:0}
+.hamburger:hover{background:var(--bg);color:var(--text)}
+.content{flex:1;overflow-y:auto;padding:24px}
+.content::-webkit-scrollbar{width:5px}
+.content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── PAGES ──────────────────────────────────────────────────────────── */
+.page{display:none}
+.page.active{display:block;animation:fadeUp .22s ease}
+
+/* ── ANIMATIONS ──────────────────────────────────────────────────────── */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+@keyframes slideInL{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+@keyframes slideInR{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+@keyframes popIn{0%{transform:scale(.5)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
+@keyframes badgePop{0%{transform:scale(0)}60%{transform:scale(1.35)}100%{transform:scale(1)}}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px) scale(.97)}to{opacity:1;transform:none}}
+
+.modal-bg.open .modal{animation:scaleIn .2s cubic-bezier(.34,1.2,.64,1)}
+.stat-card{transition:transform .2s ease,box-shadow .2s ease}
+.stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.check-circle.done{animation:popIn .25s ease}
+.toast.show{animation:slideInR .25s ease}
+
+/* ── BUTTONS ─────────────────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .16s}
+.btn:active{transform:scale(.96)}
+.btn-primary{background:var(--brand);color:#fff;box-shadow:0 1px 4px rgba(92,107,192,.3)}
+.btn-primary:hover{background:var(--brand-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(92,107,192,.4)}
+.btn-ghost{background:var(--white);color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--border2);color:var(--text)}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-icon{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 8px;cursor:pointer;color:var(--text2);display:inline-flex;align-items:center;transition:all .15s}
+.btn-icon:hover{background:var(--bg);color:var(--text);transform:scale(1.05)}
+.btn-danger-icon{border-color:#FECACA;color:var(--red)}.btn-danger-icon:hover{background:var(--red-bg)}
+
+/* ── CARDS ───────────────────────────────────────────────────────────── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-title{font-size:14px;font-weight:600}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px;border-top:3px solid var(--brand)}
+.stat-card.g{border-top-color:var(--green)}.stat-card.a{border-top-color:var(--amber)}.stat-card.b{border-top-color:var(--blue)}
+.stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;font-weight:500}
+.stat-val{font-size:26px;font-weight:700;line-height:1;animation:fadeUp .4s ease}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:4px}
+
+/* ── BADGES ──────────────────────────────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
+.badge-green{background:var(--green-bg);color:#065F46}
+.badge-amber{background:var(--amber-bg);color:#92400E}
+.badge-red{background:var(--red-bg);color:#991B1B}
+.badge-blue{background:var(--blue-bg);color:#1E40AF}
+.badge-purple{background:var(--brand-light);color:var(--brand-dark)}
+.badge-gray{background:#F3F4F6;color:var(--text2)}
+
+/* ── ROWS & TABLE ────────────────────────────────────────────────────── */
+.row-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.row-item:last-child{border-bottom:none;padding-bottom:0}
+.row-item:first-child{padding-top:0}
+.row-name{font-size:13.5px;font-weight:500}.row-sub{font-size:12px;color:var(--text3);margin-top:1px}
+.row-actions{display:flex;gap:5px;margin-left:auto;opacity:0;transition:opacity .15s}
+.row-item:hover .row-actions,.table-row:hover .row-actions{opacity:1}
+.av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.av-sm{width:28px;height:28px;font-size:10px}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);font-weight:500;padding:8px 12px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+.tbl td{padding:11px 12px;border-bottom:1px solid var(--border);font-size:13.5px;color:var(--text2);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.table-row:hover td{background:#FAFAFA}
+.name-cell{color:var(--text);font-weight:500;display:flex;align-items:center;gap:10px}
+
+/* ── TASKS ───────────────────────────────────────────────────────────── */
+.task-item{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}
+.task-item:last-child{border-bottom:none}
+.check-circle{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border2);cursor:pointer;flex-shrink:0;margin-top:1px;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.check-circle:hover:not(.done){border-color:var(--brand);background:var(--brand-light)}
+.check-circle.done{background:var(--green);border-color:var(--green)}
+.check-circle.done::after{content:'✓';color:#fff;font-size:10px;font-weight:700}
+.task-title{font-size:13.5px;font-weight:500}.task-title.done{text-decoration:line-through;color:var(--text3)}
+.task-meta{font-size:11px;color:var(--text3);margin-top:3px;display:flex;gap:8px;align-items:center}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}.dot-high{background:var(--red)}.dot-med{background:var(--amber)}.dot-low{background:var(--green)}
+
+/* ── MESSAGES ────────────────────────────────────────────────────────── */
+.msg-list{display:flex;flex-direction:column;gap:10px;padding:4px 0 16px;flex:1;overflow-y:auto;min-height:0}
+.msg-list::-webkit-scrollbar{width:4px}
+.msg-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.msg{display:flex;gap:8px;align-items:flex-end;animation:msgIn .22s ease both}
+.msg.me{flex-direction:row-reverse}
+.bubble{max-width:70%;padding:9px 14px;border-radius:16px;font-size:13.5px;line-height:1.55;word-break:break-word}
+.msg.them .bubble{background:var(--bg);color:var(--text);border-bottom-left-radius:3px}
+.msg.me .bubble{background:var(--brand);color:#fff;border-bottom-right-radius:3px;box-shadow:0 2px 8px rgba(92,107,192,.22)}
+.msg-meta{font-size:11px;color:var(--text3);margin-top:4px;white-space:nowrap}
+.msg.me .msg-meta{text-align:right}
+.msg-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;color:var(--text3);font-size:13px;gap:10px;padding:40px 20px;animation:fadeUp .4s ease}
+.msg-empty svg{opacity:.25}
+.mention-chip{display:inline-block;background:var(--brand-light);color:var(--brand-dark);padding:1px 6px;border-radius:999px;font-weight:600}
+.notif-card{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.notif-card:last-child{border-bottom:none}
+.notif-icon{width:32px;height:32px;border-radius:10px;background:var(--brand-light);display:flex;align-items:center;justify-content:center;color:var(--brand-dark);font-size:13px;font-weight:700;flex-shrink:0}
+.notif-card.unread{background:linear-gradient(90deg, rgba(92,107,192,.06), transparent)}
+.msg-bar{display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--border);flex-shrink:0;align-items:center}
+.msg-input{flex:1;border:1px solid var(--border);border-radius:22px;padding:9px 16px;font-size:13.5px;font-family:'Inter',sans-serif;color:var(--text);outline:none;background:var(--bg);transition:border .15s,background .15s,box-shadow .15s}
+.msg-input:focus{border-color:var(--brand);background:var(--white);box-shadow:0 0 0 3px rgba(92,107,192,.1)}
+.msg-send-btn{width:38px;height:38px;min-width:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:all .18s}
+.msg-send-btn:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(92,107,192,.4)}
+.msg-send-btn:active{transform:scale(.93)}
+
+/* ── PROGRESS ────────────────────────────────────────────────────────── */
+.prog{height:5px;background:var(--bg);border-radius:3px;overflow:hidden;margin-top:6px}
+.prog-bar{height:100%;border-radius:3px;background:var(--brand);transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+/* ── MODAL ───────────────────────────────────────────────────────────── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:50;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.modal-bg.open{display:flex;animation:fadeIn .15s ease}
+.modal{background:var(--white);border-radius:var(--radius);padding:24px;width:460px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:18px}
+.fg{margin-bottom:13px}
+.fg label{display:block;font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.fg input,.fg select{width:100%;border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 11px;font-size:13.5px;font-family:'Inter',sans-serif;color:var(--text);outline:none;transition:border .15s,box-shadow .15s}
+.fg input:focus,.fg select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(92,107,192,.1)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+
+/* ── SEARCH / MISC ───────────────────────────────────────────────────── */
+.search{border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none;width:190px;transition:width .2s,border .15s}
+.search:focus{border-color:var(--brand);width:220px}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--text);color:#fff;padding:10px 16px;border-radius:var(--radius-sm);font-size:13px;z-index:100;transform:translateY(10px);opacity:0;transition:all .25s;box-shadow:0 4px 16px rgba(0,0,0,.15);max-width:300px}
+.toast.show{transform:none;opacity:1}
+.toast.ok{border-left:3px solid var(--green)}.toast.err{border-left:3px solid var(--red)}
+.cred-box{background:var(--bg);border-radius:var(--radius-sm);padding:16px;margin:12px 0;font-size:13px;line-height:2}
+.cred-box b{color:var(--text)}
+.clock-card{text-align:center;padding:28px 20px}
+.clock-display{font-size:44px;font-weight:700;color:var(--brand);letter-spacing:-1px;margin-bottom:4px;font-variant-numeric:tabular-nums}
+.clock-status{font-size:13px;color:var(--text3);margin-bottom:20px}
+.clock-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;align-items:center}
+.clock-btn{padding:12px 32px;font-size:14px;border-radius:30px}
+.clock-pause-btn{padding:12px 20px;font-size:14px;border-radius:30px}
+.clock-summary{font-size:12px;color:var(--text3);margin-top:14px;min-height:18px}
+.clock-modal-hint{font-size:12px;color:var(--text3);margin-bottom:14px}
+svg{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────────── */
+@media(max-width:960px){
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .two-col{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+  body{height:100dvh}
+  .sidebar{
+    position:fixed;top:0;left:0;bottom:0;z-index:100;
+    width:240px;
+    transform:translateX(-100%);
+    box-shadow:4px 0 24px rgba(0,0,0,.12);
+  }
+  .sidebar.open{transform:translateX(0)}
+  .hamburger{display:flex}
+  .main{height:100dvh;width:100%;overflow:hidden}
+  .topbar{height:52px;padding:0 14px}
+  .page-title{font-size:15px}
+  .content{padding:14px}
+  .stats-row{grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .stat-val{font-size:22px}
+  .card{padding:16px;margin-bottom:12px}
+  .two-col{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .modal{padding:20px}
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  #page-members .card{padding:0;overflow:hidden}
+  #page-messages .card{height:calc(100dvh - 108px)}
+  .search{width:130px}
+  .search:focus{width:155px}
+  .clock-display{font-size:36px}
+  .clock-btn{padding:10px 26px}
+}
+@media(max-width:480px){
+  .stats-row{grid-template-columns:1fr}
+  .topbar-right .btn span{display:none}
+  .stat-val{font-size:28px}
+  .bubble{max-width:82%}
+  .tbl th,.tbl td{font-size:12px;padding:8px 8px}
+}
+
+/* ── DIRECTORATES ────────────────────────────────────────────────────── */
+.dir-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.dir-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px;transition:box-shadow .2s,transform .2s}
+.dir-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.08);transform:translateY(-2px)}
+.dir-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:12px}
+.dir-name{font-size:15px;font-weight:600;color:var(--text)}
+.dir-desc{font-size:12px;color:var(--text3);margin-top:3px}
+.dir-actions{display:flex;gap:5px;flex-shrink:0}
+.dir-footer{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)}
+/* assign-type radio toggle in task modal */
+.assign-toggle{display:flex;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:0}
+.assign-toggle input[type=radio]{display:none}
+.assign-toggle label{flex:1;text-align:center;padding:7px 10px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;color:var(--text2);background:var(--white)}
+.assign-toggle input[type=radio]:checked + label{background:var(--brand);color:#fff}
+/* directorate badge on tasks */
+.badge-dir{background:#EDE7F6;color:#4527A0}
+
+/* ── REQUESTS ────────────────────────────────────────────────────────── */
+.req-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px;overflow-x:auto}
+.req-tab{padding:9px 16px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;margin-bottom:-1px;white-space:nowrap;flex-shrink:0}
+.req-tab.active{color:var(--brand);border-bottom-color:var(--brand)}
+.req-tab:hover:not(.active){color:var(--text);background:var(--bg)}
+.req-row{display:flex;align-items:flex-start;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
+.req-row:last-child{border-bottom:none}
+.req-actions{display:flex;gap:6px;flex-shrink:0;align-items:center}
+textarea.fg-area{width:100%;border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 11px;font-size:13.5px;font-family:'Inter',sans-serif;color:var(--text);outline:none;resize:vertical;min-height:76px;transition:border .15s,box-shadow .15s}
+textarea.fg-area:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(92,107,192,.1)}
+</style>
+</head>
+<body>
+
+<!-- Mobile sidebar overlay -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<aside class="sidebar" id="main-sidebar">
+  <div class="logo">
+    <img src="logo.png" class="logo-box" alt="TeamFlow"/>
+    <span class="logo-text">TeamFlow</span>
+  </div>
+  <nav id="main-nav">
+    <div class="nav-item active" data-page="dashboard" data-roles="admin director member">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="nav-label">Dashboard</span>
+    </div>
+    <div class="nav-item" data-page="members" data-roles="admin director" id="nav-members">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      <span class="nav-label">Members</span>
+    </div>
+    <div class="nav-item" data-page="shifts" data-roles="admin director">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span class="nav-label">Schedule</span>
+    </div>
+    <div class="nav-item" data-page="tasks" data-roles="admin director member">
+      <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      <span class="nav-label">Tasks</span>
+    </div>
+    <div class="nav-item" data-page="attendance" data-roles="admin director member">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span class="nav-label">Attendance</span>
+    </div>
+    <div class="nav-item" data-page="messages" data-roles="admin director member">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      <span class="nav-label">Messages</span>
+      <span class="nav-badge" id="msg-nav-badge">0</span>
+    </div>
+    <div class="nav-item" data-page="notifications" data-roles="admin director member">
+      <svg viewBox="0 0 24 24"><path d="M15 17H4a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2z"/><path d="M15 17l3 3 3-3"/></svg>
+      <span class="nav-label">Notifications</span>
+      <span class="nav-badge" id="notif-nav-badge">0</span>
+    </div>
+    <div class="nav-item" data-page="directorates" data-roles="admin" id="nav-directorates">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="nav-label">Directorates</span>
+    </div>
+    <div class="nav-item" data-page="workspaces" data-roles="admin director member" id="nav-workspaces">
+      <svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="M4 10h16"/><path d="M10 6v12"/></svg>
+      <span class="nav-label">Workspaces</span>
+    </div>
+    <div class="nav-item" data-page="requests" data-roles="admin director member">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <span class="nav-label">Requests</span>
+      <span class="nav-badge" id="req-nav-badge">0</span>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-av" id="user-av">—</div>
+    <div class="user-info">
+      <div class="name" id="user-name">Loading…</div>
+      <div class="urole" id="user-role-label">—</div>
+    </div>
+    <button class="logout-btn" onclick="logout()" title="Sign out">
+      <svg viewBox="0 0 24 24" width="16" height="16"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" id="hamburger-btn" onclick="toggleSidebar()" aria-label="Toggle menu">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="page-title" id="page-title">Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <input class="search" id="member-search" placeholder="Search members…" style="display:none" oninput="searchMembers(this.value)"/>
+      <button class="btn btn-primary" id="action-btn" onclick="mainAction()">
+        <svg viewBox="0 0 24 24" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span id="action-label">Add Member</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div id="dash-admin-stats" style="display:none">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Total Members</div><div class="stat-val" id="s-members">—</div><div class="stat-sub" id="s-new">—</div></div>
+          <div class="stat-card g"><div class="stat-label">Clocked In Now</div><div class="stat-val" id="s-clocked">—</div><div class="stat-sub" id="s-clocked-sub">working today</div></div>
+          <div class="stat-card a"><div class="stat-label">Tasks Due Today</div><div class="stat-val" id="s-tasks">—</div><div class="stat-sub" id="s-done">—</div></div>
+          <div class="stat-card b"><div class="stat-label">Messages Today</div><div class="stat-val" id="s-msgs">—</div><div class="stat-sub">team chat</div></div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Today's Shifts</span></div>
+            <div id="dash-shifts"><div style="color:var(--text3);font-size:13px">Loading…</div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Tasks</span><span id="task-prog-txt" style="font-size:12px;color:var(--text3)">—</span></div>
+            <div class="prog" style="margin-bottom:16px"><div class="prog-bar" id="task-prog-bar" style="width:0%"></div></div>
+            <div id="dash-tasks"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Director-only stats strip (no total-members count) -->
+      <div id="dash-director-stats" style="display:none">
+        <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+          <div class="stat-card g">
+            <div class="stat-label">Directorate Clocked In</div>
+            <div class="stat-val" id="ds-clocked">—</div>
+            <div class="stat-sub" id="ds-clocked-sub">in your directorate</div>
+          </div>
+          <div class="stat-card a">
+            <div class="stat-label">Tasks Due Today</div>
+            <div class="stat-val" id="ds-tasks">—</div>
+            <div class="stat-sub">directorate scope</div>
+          </div>
+          <div class="stat-card b">
+            <div class="stat-label">Messages Today</div>
+            <div class="stat-val" id="ds-msgs">—</div>
+            <div class="stat-sub">team chat</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="dash-member-view" style="display:none">
+        <div class="stats-row" style="grid-template-columns:repeat(3,1fr)" id="member-stats-row">
+          <div class="stat-card"><div class="stat-label">My Pending Tasks</div><div class="stat-val" id="m-tasks">—</div><div class="stat-sub">assigned to me</div></div>
+          <div class="stat-card g"><div class="stat-label">Messages Today</div><div class="stat-val" id="m-msgs">—</div><div class="stat-sub">team chat</div></div>
+          <div class="stat-card b"><div class="stat-label">Today's Shift</div><div class="stat-val" id="m-shift-time">—</div><div class="stat-sub" id="m-shift-status">—</div></div>
+        </div>
+        <div class="two-col">
+          <div class="card clock-card" id="clock-card">
+            <div class="clock-display" id="clock-display">0h 00m</div>
+            <div class="clock-status" id="clock-status-txt">Not clocked in today</div>
+            <div class="clock-actions">
+              <button class="btn btn-primary clock-btn" id="clock-btn" onclick="toggleClock()">Clock In</button>
+              <button class="btn btn-ghost clock-pause-btn" id="clock-pause-btn" onclick="toggleClockPause()" style="display:none">Pause</button>
+            </div>
+            <div class="clock-summary" id="clock-summary"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">My Tasks</span></div>
+            <div id="member-tasks-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEMBERS -->
+    <div class="page" id="page-members">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Name</th><th>Job Role</th><th>Access</th><th>Department</th>
+                <th>Type</th><th>Status</th><th>Director</th><th>Workspace</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="members-body">
+              <tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text3)">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHIFTS -->
+    <div class="page" id="page-shifts">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Shift Schedule</span>
+          <input type="date" id="shift-date-filter" class="search" style="width:auto" onchange="loadShifts()"/>
+        </div>
+        <div id="shifts-list"></div>
+      </div>
+    </div>
+
+    <!-- TASKS -->
+    <div class="page" id="page-tasks">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Tasks</span></div>
+        <div id="tasks-list"></div>
+      </div>
+    </div>
+
+    <!-- ATTENDANCE -->
+    <div class="page" id="page-attendance">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Attendance</span>
+          <input type="date" id="att-date-filter" class="search" style="width:auto" onchange="loadAttendance()"/>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr><th>Member</th><th>Clock In</th><th>Clock Out</th><th>Duration</th><th>Status</th><th>Today's Focus</th><th>Accomplishments</th></tr>
+            </thead>
+            <tbody id="att-body">
+              <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text3)">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="page" id="page-messages">
+      <div class="card" style="display:flex;flex-direction:column;height:calc(100vh - 148px)">
+        <div class="card-header" style="flex-shrink:0">
+          <span class="card-title">Team Chat</span>
+          <span id="msg-status" style="font-size:11px;color:var(--text3)"></span>
+        </div>
+        <div id="msg-list" class="msg-list"></div>
+        <div class="msg-bar">
+          <input class="msg-input" id="msg-in" placeholder="Type a message… (Enter to send)"
+                 onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"/>
+          <button class="btn btn-primary msg-send-btn" onclick="sendMsg()" title="Send">
+            <svg viewBox="0 0 24 24" width="15" height="15"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="page" id="page-notifications">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Notifications</span><button class="btn btn-ghost btn-sm" onclick="markNotificationsRead()">Mark all read</button></div>
+        <div id="notifications-list"></div>
+      </div>
+    </div>
+
+    <!-- DIRECTORATES -->
+    <div class="page" id="page-directorates">
+      <div id="directorates-list" class="dir-grid"></div>
+    </div>
+
+    <!-- WORKSPACES -->
+    <div class="page" id="page-workspaces">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Workspaces</span>
+        </div>
+        <div id="workspaces-list" class="dir-grid"></div>
+      </div>
+    </div>
+
+    <!-- REQUESTS -->
+    <div class="page" id="page-requests">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Leave &amp; Break Requests</span>
+        </div>
+        <div id="req-tabs" class="req-tabs" style="display:none"></div>
+        <div id="requests-list"><div style="color:var(--text3);font-size:13px;padding:12px 0">Loading…</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MEMBER MODAL -->
+<div class="modal-bg" id="modal-member">
+  <div class="modal">
+    <div class="modal-title" id="modal-member-title">Add Member</div>
+    <div class="form-row">
+      <div class="fg"><label>Full name *</label><input id="m-name" placeholder="James Lee"/></div>
+      <div class="fg"><label>Email *</label><input id="m-email" type="email" placeholder="james@co.com"/></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Job Title</label><input id="m-role" placeholder="Floor Manager"/></div>
+      <div class="fg"><label>Department</label><input id="m-dept" placeholder="Operations"/></div>
+    </div>
+    <div class="form-row">
+      <div class="fg">
+        <label>Access Level</label>
+        <select id="m-user-role" onchange="toggleDirectorField()">
+          <option value="member">Member</option>
+          <option value="director">Director</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div class="fg" id="director-field">
+        <label>Assign to Director</label>
+        <select id="m-director"><option value="">— None —</option></select>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Directorate</label>
+      <select id="m-directorate"><option value="">— None —</option></select>
+    </div>
+    <div class="fg">
+      <label>Workspace</label>
+      <select id="m-workspace"><option value="">— None —</option></select>
+    </div>
+    <div class="form-row">
+      <div class="fg">
+        <label>Employment Type</label>
+        <select id="m-type"><option value="full-time">Full-time</option><option value="part-time">Part-time</option><option value="contractor">Contractor</option></select>
+      </div>
+      <div class="fg">
+        <label>Status</label>
+        <select id="m-status"><option value="active">Active</option><option value="on-leave">On Leave</option><option value="inactive">Inactive</option></select>
+      </div>
+    </div>
+    <div class="fg"><label>Phone</label><input id="m-phone" placeholder="+65 9123 4567"/></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-member')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveMember()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- CREDENTIALS MODAL -->
+<div class="modal-bg" id="modal-creds">
+  <div class="modal">
+    <div class="modal-title">✓ Member Added</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:4px">Share these login credentials with the new member:</p>
+    <div class="cred-box">
+      <div><b>Email:</b> <span id="cred-email"></span></div>
+      <div><b>Temp Password:</b> <span id="cred-pass" style="font-family:monospace;font-size:15px;color:var(--brand-dark)"></span></div>
+    </div>
+    <p style="font-size:12px;color:var(--text3)">The member must change this password on first login.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="copyCredentials()">Copy</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-creds')">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHIFT MODAL -->
+<div class="modal-bg" id="modal-shift">
+  <div class="modal">
+    <div class="modal-title">Add Shift</div>
+    <div class="fg"><label>Member *</label><select id="sh-member"><option value="">— Select —</option></select></div>
+    <div class="form-row">
+      <div class="fg"><label>Date</label><input id="sh-date" type="date"/></div>
+      <div class="fg"><label>Status</label><select id="sh-status"><option value="upcoming">Upcoming</option><option value="active">Active</option><option value="completed">Completed</option><option value="absent">Absent</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Start</label><input id="sh-start" type="time" value="09:00"/></div>
+      <div class="fg"><label>End</label><input id="sh-end" type="time" value="17:00"/></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-shift')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveShift()">Add Shift</button>
+    </div>
+  </div>
+</div>
+
+<!-- TASK DETAIL MODAL -->
+<div class="modal-bg" id="modal-task-detail">
+  <div class="modal">
+    <div class="modal-title" id="task-detail-title">Task details</div>
+    <p id="task-detail-meta" style="font-size:12px;color:var(--text3);margin-top:-6px;margin-bottom:10px"></p>
+    <div class="fg">
+      <label>Status</label>
+      <select id="task-detail-status">
+        <option value="pending">Pending</option>
+        <option value="in-progress">In Progress</option>
+        <option value="completed">Completed</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>What I intend to do</label>
+      <textarea id="task-detail-plan" class="fg-area" placeholder="Describe the work you will carry out on this task"></textarea>
+    </div>
+    <div class="fg">
+      <label>Closing statement (required when marking done)</label>
+      <textarea id="task-detail-close" class="fg-area" placeholder="Summarise what you completed and any next step"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-task-detail')">Close</button>
+      <button class="btn btn-primary" onclick="saveTaskProgress()">Save progress</button>
+      <button class="btn" style="background:var(--green);color:#fff" onclick="markTaskDone()">Mark as done</button>
+    </div>
+  </div>
+</div>
+
+<!-- TASK MODAL -->
+<div class="modal-bg" id="modal-task">
+  <div class="modal">
+    <div class="modal-title">Add Task</div>
+    <div class="fg"><label>Title *</label><input id="t-title" placeholder="e.g. Update handbook"/></div>
+    <div class="fg">
+      <label>Assign Type</label>
+      <div class="assign-toggle">
+        <input type="radio" name="t-assign-type" id="t-type-member" value="member" checked onchange="toggleTaskAssignType()">
+        <label for="t-type-member">Member / Director</label>
+        <input type="radio" name="t-assign-type" id="t-type-dir" value="directorate" onchange="toggleTaskAssignType()">
+        <label for="t-type-dir">Whole Directorate</label>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="fg" id="t-member-field">
+        <label>Member</label>
+        <select id="t-assigned"><option value="">— Unassigned —</option></select>
+      </div>
+      <div class="fg" id="t-directorate-field" style="display:none">
+        <label>Directorate</label>
+        <select id="t-directorate"><option value="">— Select —</option></select>
+      </div>
+      <div class="fg"><label>Due date</label><input id="t-due" type="date"/></div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Priority</label><select id="t-priority"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option></select></div>
+      <div class="fg"><label>Status</label><select id="t-status"><option value="pending">Pending</option><option value="in-progress">In Progress</option><option value="completed">Completed</option></select></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-task')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTask()">Create Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEW REQUEST MODAL -->
+<div class="modal-bg" id="modal-request">
+  <div class="modal">
+    <div class="modal-title">New Request</div>
+    <div class="fg">
+      <label>Request Type *</label>
+      <select id="req-type" onchange="toggleReqEndDate()">
+        <option value="annual_leave">🏖 Annual Leave</option>
+        <option value="sick_leave">🤒 Sick Leave</option>
+        <option value="emergency_leave">🚨 Emergency / Personal Leave</option>
+        <option value="maternity_leave">👶 Maternity Leave</option>
+        <option value="paternity_leave">👨‍👦 Paternity Leave</option>
+        <option value="short_break">☕ Short Break</option>
+        <option value="other">📋 Other</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label id="req-start-lbl">From *</label><input id="req-start" type="date"/></div>
+      <div class="fg" id="req-end-wrap"><label>To (optional)</label><input id="req-end" type="date"/></div>
+    </div>
+    <div class="fg">
+      <label>Reason / Notes</label>
+      <textarea id="req-reason" class="fg-area" placeholder="Brief explanation (optional)…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-request')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRequest()">Submit Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEW REQUEST MODAL -->
+<div class="modal-bg" id="modal-review">
+  <div class="modal">
+    <div class="modal-title">Review Request</div>
+    <div id="review-req-info" style="background:var(--bg);border-radius:var(--radius-sm);padding:14px;margin-bottom:14px;font-size:13px;line-height:2;color:var(--text2)"></div>
+    <div class="fg">
+      <label>Reviewer Notes (optional)</label>
+      <textarea id="review-notes" class="fg-area" placeholder="e.g. Approved — cover arranged"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-review')">Cancel</button>
+      <button class="btn" style="background:var(--red);color:#fff;box-shadow:0 1px 4px rgba(239,68,68,.25)" onclick="submitReview('reject')">Reject</button>
+      <button class="btn" style="background:var(--green);color:#fff;box-shadow:0 1px 4px rgba(16,185,129,.25)" onclick="submitReview('approve')">Approve</button>
+    </div>
+  </div>
+</div>
+
+<!-- WORKSPACE MODAL -->
+<div class="modal-bg" id="modal-workspace">
+  <div class="modal">
+    <div class="modal-title" id="modal-workspace-title">New Workspace</div>
+    <div class="fg"><label>Name *</label><input id="ws-name" placeholder="e.g. Marketing Workspace"/></div>
+    <div class="fg"><label>Description</label><input id="ws-desc" placeholder="Brief description (optional)"/></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-workspace')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveWorkspace()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- DIRECTORATE MODAL -->
+<div class="modal-bg" id="modal-directorate">
+  <div class="modal">
+    <div class="modal-title" id="modal-dir-title">New Directorate</div>
+    <div class="fg"><label>Name *</label><input id="dir-name" placeholder="e.g. Engineering Directorate"/></div>
+    <div class="fg"><label>Description</label><input id="dir-desc" placeholder="Brief description (optional)"/></div>
+    <div class="fg"><label>Team Lead (Director)</label><select id="dir-director"><option value="">— None —</option></select></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-directorate')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveDirectorate()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- TASK TODAY MODAL -->
+<div class="modal-bg" id="modal-task-today">
+  <div class="modal">
+    <div class="modal-title">What's your focus today?</div>
+    <p class="clock-modal-hint">You've just clocked in. Briefly describe what you plan to work on this session — your timer starts once you're done.</p>
+    <div class="fg">
+      <label>Today's Plan</label>
+      <textarea id="task-today-input" class="fg-area" style="min-height:100px" placeholder="e.g. Finish the quarterly report, attend 2pm team meeting, review design mockups…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="submitTaskToday()">Let's go</button>
+    </div>
+  </div>
+</div>
+
+<!-- CLOCK OUT MODAL -->
+<div class="modal-bg" id="modal-clock-out">
+  <div class="modal">
+    <div class="modal-title">Before you go — what did you accomplish?</div>
+    <p class="clock-modal-hint">Take a moment to capture what you got done this session. It goes a long way.</p>
+    <div class="fg">
+      <label>Today's Wins</label>
+      <textarea id="clock-out-input" class="fg-area" style="min-height:100px" placeholder="e.g. Completed the Q3 report, resolved 3 support tickets, led the team standup…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="cancelClockOut()">Cancel</button>
+      <button class="btn" style="background:var(--red);color:#fff;box-shadow:0 1px 4px rgba(239,68,68,.25)" onclick="confirmClockOut()">Clock Out</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'Teamapi/';
+let currentUser   = null;
+let currentPage   = 'dashboard';
+let allMembers    = [];
+let editMemberId  = null;
+let clockInterval = null;
+let isClockedIn   = false;
+let clockInTime   = null;
+let msgPollTimer     = null;
+let lastMsgId        = 0;
+let reviewingReqId   = null;
+let allRequests      = [];
+let reqCurrentFilter = 'all';
+let taskDetailId     = null;
+let clockPaused      = false;
+let pauseStartTime   = null;
+let pausedMs         = 0;
+let taskTodayTimer   = null;
+let clockOutModalPausedTimer = false;
+
+// ── UTILS ─────────────────────────────────────────────────────────────
+const $   = id => document.getElementById(id);
+const fmt = d  => d ? new Date(d + 'T00:00:00').toLocaleDateString('en-SG', { month: 'short', day: 'numeric' }) : '—';
+const fmtT  = t  => t ? t.substring(0, 5) : '';
+const fmtDT = dt => dt ? new Date(dt.replace(' ', 'T')).toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit' }) : '—';
+const initials = n => (n || '?').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+const fmtDur   = m => m ? `${Math.floor(m/60)}h ${(m%60).toString().padStart(2,'0')}m` : '—';
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function nameToColor(str) {
+  const palette = ['#5C6BC0','#26A69A','#EF5350','#AB47BC','#42A5F5',
+                   '#FF7043','#66BB6A','#FFA726','#8D6E63','#78909C'];
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+  return palette[Math.abs(h) % palette.length];
+}
+
+function toast(msg, type = 'ok') {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+async function api(endpoint, opts = {}) {
+  try {
+    const res  = await fetch(API + endpoint, {
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      ...opts,
+      body: opts.body ? JSON.stringify(opts.body) : undefined
+    });
+    const data = await res.json();
+    if (res.status === 401 || data.redirect === 'login') { window.location.href = 'login.html'; return; }
+    if (res.status === 403 && data.redirect === 'change_password') { window.location.href = 'login.html?change=1'; return; }
+    if (data.error) throw new Error(data.error);
+    return data;
+  } catch (e) {
+    toast(e.message || 'Network error', 'err');
+    throw e;
+  }
+}
+
+function av(name, color, cls = '') {
+  return `<div class="av ${cls}" style="background:${color || '#5C6BC0'}">${initials(name)}</div>`;
+}
+
+function roleBadge(r) {
+  const map = { admin: 'badge-purple', director: 'badge-blue', member: 'badge-gray' };
+  return `<span class="badge ${map[r] || 'badge-gray'}">${r}</span>`;
+}
+
+function statusBadge(s) {
+  const map = { active: 'green', 'on-leave': 'amber', inactive: 'gray', upcoming: 'blue', completed: 'green', absent: 'red', pending: 'amber', 'in-progress': 'purple' };
+  return `<span class="badge badge-${map[s] || 'gray'}">${s}</span>`;
+}
+
+function renderMessageText(text) {
+  const escaped = escHtml(text || '');
+  return escaped.replace(/@([A-Za-z][A-Za-z0-9_\- ]{1,40})/g, '<span class="mention-chip">@$1</span>');
+}
+
+// ── MOBILE SIDEBAR ─────────────────────────────────────────────────────
+function toggleSidebar() {
+  const sb = $('main-sidebar');
+  const ov = $('sidebar-overlay');
+  const opening = !sb.classList.contains('open');
+  sb.classList.toggle('open', opening);
+  ov.classList.toggle('show', opening);
+}
+
+function closeSidebar() {
+  $('main-sidebar').classList.remove('open');
+  $('sidebar-overlay').classList.remove('show');
+}
+
+// ── AUTH & INIT ────────────────────────────────────────────────────────
+async function init() {
+  try {
+    const auth = await fetch(API + 'auth.php?action=check', { credentials: 'same-origin' }).then(r => r.json());
+    if (!auth.logged_in) { window.location.href = 'login.html'; return; }
+    if (auth.user.must_change_password) { window.location.href = 'login.html?change=1'; return; }
+    currentUser = auth.user;
+    setupUI();
+    await refreshNotificationBadge();
+    loadDashboard();
+  } catch (e) {
+    window.location.href = 'login.html';
+  }
+}
+
+function setupUI() {
+  const role = currentUser.user_role;
+  $('user-av').textContent = initials(currentUser.name);
+  $('user-av').style.background = currentUser.avatar_color || '#5C6BC0';
+  $('user-name').textContent = currentUser.name;
+  $('user-role-label').textContent = role.charAt(0).toUpperCase() + role.slice(1);
+  if (role === 'director') $('nav-members').querySelector('.nav-label').textContent = 'My Team';
+
+  document.querySelectorAll('.nav-item[data-roles]').forEach(el => {
+    if (!el.dataset.roles.split(' ').includes(role)) el.style.display = 'none';
+  });
+}
+
+async function logout() {
+  await api('auth.php?action=logout');
+  window.location.href = 'login.html';
+}
+
+// ── NAV ────────────────────────────────────────────────────────────────
+document.querySelectorAll('.nav-item').forEach(n => n.addEventListener('click', () => {
+  if (!n.dataset.page) return;
+  switchPage(n.dataset.page);
+  if (window.innerWidth <= 768) closeSidebar();
+}));
+
+function switchPage(name) {
+  if (currentPage === 'messages' && name !== 'messages') stopMsgPolling();
+  currentPage = name;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === name));
+  document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + name));
+  $('page-title').textContent = {
+    dashboard: 'Dashboard',
+    members: currentUser?.user_role === 'director' ? 'My Team' : 'Members',
+    shifts: 'Schedule', tasks: 'Tasks', attendance: 'Attendance',
+    messages: 'Messages', notifications: 'Notifications', directorates: 'Directorates', workspaces: 'Workspaces', requests: 'Requests'
+  }[name] || name;
+  $('member-search').style.display = name === 'members' ? 'block' : 'none';
+  const actionLabels = {
+    dashboard: 'Add Member', members: 'Add Member',
+    shifts: 'Add Shift', tasks: 'Add Task',
+    attendance: null, messages: null,
+    directorates: 'Add Directorate', workspaces: 'New Workspace', requests: 'New Request'
+  };
+  const lbl  = actionLabels[name];
+  const isAdmin     = currentUser?.user_role === 'admin';
+  const isNonMember = currentUser?.user_role !== 'member';
+  // admin-only: Add Member / Add Directorate
+  // all roles: New Request
+  // admin + director: Add Shift / Add Task
+  const adminOnlyPages  = ['dashboard', 'members', 'directorates'];
+  const allRolesPages   = ['requests', 'workspaces'];
+  const canSeeBtn = lbl && (
+    adminOnlyPages.includes(name) ? isAdmin :
+    allRolesPages.includes(name)  ? true    : isNonMember
+  );
+  $('action-btn').style.display = canSeeBtn ? '' : 'none';
+  if (lbl) $('action-label').textContent = lbl;
+  if (name === 'messages') startMsgPolling();
+  else if (name === 'notifications') loadNotifications();
+  else loaders[name]?.();
+}
+
+function mainAction() {
+  const map = {
+    dashboard: openAddMember, members: openAddMember,
+    shifts: openAddShift, tasks: openAddTask,
+    directorates: openAddDirectorate, workspaces: openAddWorkspace, requests: openAddRequest
+  };
+  (map[currentPage] || openAddMember)();
+}
+
+// ── DASHBOARD ──────────────────────────────────────────────────────────
+async function loadDashboard() {
+  const s    = await api('dashboard.php');
+  if (!s) return;
+  const role = currentUser.user_role;
+
+  await refreshNotificationBadge();
+
+  // Requests nav badge (works for all roles — scoped server-side)
+  const reqBadge = $('req-nav-badge');
+  const reqCount = s.pending_requests || 0;
+  reqBadge.textContent = reqCount > 9 ? '9+' : reqCount;
+  reqBadge.classList.toggle('show', reqCount > 0);
+
+  // Show/hide the three dashboard sections
+  $('dash-admin-stats').style.display    = role === 'admin'    ? '' : 'none';
+  $('dash-director-stats').style.display = role === 'director' ? '' : 'none';
+  $('dash-member-view').style.display    = role !== 'admin'    ? '' : 'none';
+  // Member-only personal stats strip (hidden for directors — they have their own strip)
+  $('member-stats-row').style.display    = role === 'member'   ? '' : 'none';
+
+  // ── ADMIN ───────────────────────────────────────────────────────────
+  if (role === 'admin') {
+    $('s-members').textContent     = s.total_members;
+    $('s-new').textContent         = `+${s.new_members} this month`;
+    $('s-clocked').textContent     = s.clocked_in ?? '0';
+    $('s-clocked-sub').textContent = `${s.total_work_hours ?? 0} hrs logged today`;
+    $('s-tasks').textContent       = s.tasks_due;
+    $('s-done').textContent        = `${s.tasks_done ?? 0} done`;
+    $('s-msgs').textContent        = s.messages;
+
+    const shifts = await api('shifts.php');
+    if (!shifts) return;
+    $('dash-shifts').innerHTML = shifts.slice(0, 5).map(sh =>
+      `<div class="row-item">
+         ${av(sh.member_name, sh.avatar_color, 'av-sm')}
+         <div><div class="row-name">${escHtml(sh.member_name)}</div><div class="row-sub">${fmtT(sh.start_time)} – ${fmtT(sh.end_time)}</div></div>
+         ${statusBadge(sh.status)}
+       </div>`
+    ).join('') || '<div style="color:var(--text3);font-size:13px">No shifts today</div>';
+
+    const tasks = await api('tasks.php');
+    if (!tasks) return;
+    const done = tasks.filter(t => t.status === 'completed').length;
+    const pct  = tasks.length ? Math.round(done / tasks.length * 100) : 0;
+    $('task-prog-bar').style.width = pct + '%';
+    $('task-prog-txt').textContent = `${done}/${tasks.length} done`;
+    $('dash-tasks').innerHTML = tasks.slice(0, 5).map(t =>
+      `<div class="task-item" onclick="openTaskDetail(${t.id})" style="cursor:pointer">
+         <div class="check-circle ${t.status === 'completed' ? 'done' : ''}" onclick="event.stopPropagation(); openTaskDetail(${t.id})"></div>
+         <div>
+           <div class="task-title ${t.status === 'completed' ? 'done' : ''}">${escHtml(t.title)}</div>
+           <div class="task-meta">
+             <span class="dot dot-${t.priority === 'high' ? 'high' : t.priority === 'medium' ? 'med' : 'low'}"></span>
+             ${t.priority}${t.due_date ? ' · due ' + fmt(t.due_date) : ''}${taskAssignInfo(t)}
+           </div>
+         </div>
+       </div>`
+    ).join('');
+
+  // ── DIRECTOR ──────────────────────────────────────────────────────
+  } else if (role === 'director') {
+    // Directorate-wide stats strip
+    $('ds-clocked').textContent     = s.dir_clocked_in ?? '0';
+    $('ds-clocked-sub').textContent = `${s.dir_total_hours ?? 0} hrs logged today`;
+    $('ds-tasks').textContent       = s.tasks_due;
+    $('ds-msgs').textContent        = s.messages;
+
+    // Personal clock-in section (reuses member-view clock card)
+    $('m-tasks').textContent = s.my_tasks;
+    $('m-msgs').textContent  = s.messages;
+    if (s.today_shift) {
+      $('m-shift-time').textContent   = `${fmtT(s.today_shift.start_time)}–${fmtT(s.today_shift.end_time)}`;
+      $('m-shift-status').textContent = s.today_shift.status;
+    } else {
+      $('m-shift-time').textContent   = 'None';
+      $('m-shift-status').textContent = 'no shift today';
+    }
+    initClockFromData(s.attendance);
+
+    const tasks = await api('tasks.php');
+    if (!tasks) return;
+    $('member-tasks-list').innerHTML = tasks.length
+      ? tasks.map(t => `
+          <div class="task-item" onclick="openTaskDetail(${t.id})" style="cursor:pointer">
+            <div class="check-circle ${t.status === 'completed' ? 'done' : ''}" onclick="event.stopPropagation(); openTaskDetail(${t.id})"></div>
+            <div><div class="task-title ${t.status === 'completed' ? 'done' : ''}">${escHtml(t.title)}</div>
+              <div class="task-meta"><span class="dot dot-${t.priority === 'high' ? 'high' : t.priority === 'medium' ? 'med' : 'low'}"></span>${t.priority}${t.due_date ? ' · ' + fmt(t.due_date) : ''}${taskAssignInfo(t)}</div>
+            </div>
+          </div>`).join('')
+      : '<div style="color:var(--text3);font-size:13px;padding:8px 0">No tasks assigned</div>';
+
+  // ── MEMBER ────────────────────────────────────────────────────────
+  } else {
+    $('m-tasks').textContent = s.my_tasks;
+    $('m-msgs').textContent  = s.messages;
+    if (s.today_shift) {
+      $('m-shift-time').textContent   = `${fmtT(s.today_shift.start_time)}–${fmtT(s.today_shift.end_time)}`;
+      $('m-shift-status').textContent = s.today_shift.status;
+    } else {
+      $('m-shift-time').textContent   = 'None';
+      $('m-shift-status').textContent = 'no shift today';
+    }
+    initClockFromData(s.attendance);
+    const tasks = await api('tasks.php');
+    if (!tasks) return;
+    $('member-tasks-list').innerHTML = tasks.length
+      ? tasks.map(t => `
+          <div class="task-item" onclick="openTaskDetail(${t.id})" style="cursor:pointer">
+            <div class="check-circle ${t.status === 'completed' ? 'done' : ''}" onclick="event.stopPropagation(); openTaskDetail(${t.id})"></div>
+            <div><div class="task-title ${t.status === 'completed' ? 'done' : ''}">${escHtml(t.title)}</div>
+              <div class="task-meta"><span class="dot dot-${t.priority === 'high' ? 'high' : t.priority === 'medium' ? 'med' : 'low'}"></span>${t.priority}${t.due_date ? ' · ' + fmt(t.due_date) : ''}${taskAssignInfo(t)}</div>
+            </div>
+          </div>`).join('')
+      : '<div style="color:var(--text3);font-size:13px;padding:8px 0">No tasks assigned</div>';
+  }
+}
+
+// ── CLOCK IN / OUT ─────────────────────────────────────────────────────
+function updateClockDisplay() {
+  if (!clockInTime) return;
+  const rawMs = Date.now() - clockInTime.getTime();
+  const totalPausedMs = (clockPaused && pauseStartTime)
+    ? pausedMs + (Date.now() - pauseStartTime.getTime())
+    : pausedMs;
+  $('clock-display').textContent = fmtDur(Math.max(0, Math.floor((rawMs - totalPausedMs) / 60000)));
+}
+
+function startClockTick() {
+  if (clockInterval) clearInterval(clockInterval);
+  updateClockDisplay();
+  clockInterval = setInterval(updateClockDisplay, 1000);
+}
+
+function initClockFromData(att) {
+  if (att && att.clock_in && !att.clock_out) {
+    isClockedIn = true;
+    clockInTime = new Date(att.clock_in.replace(' ', 'T'));
+    clockPaused = false;
+    pauseStartTime = null;
+    pausedMs = 0;
+    startClockTick();
+  } else if (att && att.work_minutes) {
+    $('clock-summary').textContent = `Today: ${fmtDur(att.work_minutes)} worked`;
+  }
+  updateClockBtn();
+}
+
+function updateClockBtn() {
+  const btn = $('clock-btn');
+  const pauseBtn = $('clock-pause-btn');
+  if (isClockedIn) {
+    btn.textContent = 'Clock Out';
+    btn.style.background = 'var(--red)';
+    btn.style.boxShadow = '0 1px 4px rgba(239,68,68,.3)';
+    $('clock-status-txt').textContent = clockPaused ? 'Timer paused' : 'Currently clocked in';
+    pauseBtn.style.display = '';
+    pauseBtn.textContent = clockPaused ? 'Resume' : 'Pause';
+  } else {
+    btn.textContent = 'Clock In';
+    btn.style.background = '';
+    btn.style.boxShadow = '';
+    $('clock-status-txt').textContent = 'Not clocked in today';
+    $('clock-display').textContent = '0h 00m';
+    pauseBtn.style.display = 'none';
+    if (clockInterval) { clearInterval(clockInterval); clockInterval = null; }
+  }
+}
+
+async function toggleClock() {
+  if (isClockedIn) {
+    // Pause timer while clock-out modal is open (if not already paused by user)
+    if (!clockPaused) {
+      clockPaused = true;
+      pauseStartTime = new Date();
+      clockOutModalPausedTimer = true;
+      updateClockBtn();
+    } else {
+      clockOutModalPausedTimer = false;
+    }
+    $('clock-out-input').value = '';
+    openModal('modal-clock-out');
+  } else {
+    const r = await api('attendance.php?action=clock_in', { method: 'POST' });
+    if (!r) return;
+    isClockedIn = true;
+    clockInTime = new Date();
+    clockPaused = true;
+    pauseStartTime = new Date();
+    pausedMs = 0;
+    startClockTick();
+    updateClockBtn();
+    toast('Clocked in!');
+    // Show focus prompt 30 seconds after clock-in; timer stays paused until dismissed
+    taskTodayTimer = setTimeout(() => {
+      $('task-today-input').value = '';
+      openModal('modal-task-today');
+    }, 30000);
+  }
+}
+
+function toggleClockPause() {
+  if (!isClockedIn) return;
+  if (clockPaused) {
+    if (pauseStartTime) {
+      pausedMs += Date.now() - pauseStartTime.getTime();
+      pauseStartTime = null;
+    }
+    clockPaused = false;
+    toast('Timer resumed');
+  } else {
+    clockPaused = true;
+    pauseStartTime = new Date();
+    toast('Timer paused');
+  }
+  updateClockBtn();
+}
+
+function submitTaskToday() {
+  const plan = $('task-today-input').value.trim();
+  if (!plan) { toast('Please describe what you plan to work on today.', 'err'); return; }
+  closeModal('modal-task-today');
+  _resumeClockAfterModal();
+  toast(`Focus set: "${plan.substring(0, 50)}${plan.length > 50 ? '…' : ''}"`);
+  api('attendance.php?action=save_task_note', { method: 'POST', body: { note: plan } });
+}
+
+function _resumeClockAfterModal() {
+  if (clockPaused && pauseStartTime) {
+    pausedMs += Date.now() - pauseStartTime.getTime();
+    pauseStartTime = null;
+  }
+  clockPaused = false;
+  updateClockBtn();
+}
+
+function cancelClockOut() {
+  closeModal('modal-clock-out');
+  if (clockOutModalPausedTimer) {
+    if (pauseStartTime) {
+      pausedMs += Date.now() - pauseStartTime.getTime();
+      pauseStartTime = null;
+    }
+    clockPaused = false;
+    clockOutModalPausedTimer = false;
+    updateClockBtn();
+  }
+}
+
+async function confirmClockOut() {
+  closeModal('modal-clock-out');
+  const achieved = $('clock-out-input').value.trim();
+  if (clockPaused && pauseStartTime) {
+    pausedMs += Date.now() - pauseStartTime.getTime();
+    pauseStartTime = null;
+  }
+  clockPaused = false;
+  clockOutModalPausedTimer = false;
+  const r = await api('attendance.php?action=clock_out', { method: 'POST', body: { achievement_note: achieved } });
+  if (!r) return;
+  isClockedIn = false; clockInTime = null; pausedMs = 0;
+  $('clock-summary').textContent = `Today: ${fmtDur(r.work_minutes)} worked`;
+  toast(achieved ? `Clocked out! "${achieved.substring(0, 40)}${achieved.length > 40 ? '…' : ''}"` : 'Clocked out — great work!');
+  updateClockBtn();
+}
+
+// ── MEMBERS ────────────────────────────────────────────────────────────
+async function loadMembers(q = '') {
+  allMembers = await api('members.php' + (q ? '?q=' + encodeURIComponent(q) : '')) || [];
+  renderMembers(allMembers);
+}
+
+function renderMembers(list) {
+  $('members-body').innerHTML = list.length ? list.map(m => {
+    const dir = allMembers.find(x => x.id == m.director_id);
+    return `<tr class="table-row">
+      <td><div class="name-cell">${av(m.name, m.avatar_color, 'av-sm')} ${escHtml(m.name)}</div></td>
+      <td>${escHtml(m.role || '—')}</td>
+      <td>${roleBadge(m.user_role)}</td>
+      <td>${escHtml(m.department || '—')}</td>
+      <td><span class="badge badge-gray">${m.employment_type}</span></td>
+      <td>${statusBadge(m.status)}</td>
+      <td style="color:var(--text3);font-size:12px">${dir ? escHtml(dir.name) : '—'}</td>
+      <td style="color:var(--text3);font-size:12px">${m.workspace_name ? escHtml(m.workspace_name) : '—'}</td>
+      <td>
+        ${currentUser.user_role === 'admin' ? `
+        <div class="row-actions">
+          <button class="btn-icon" onclick="openEditMember(${m.id})" title="Edit">
+            <svg viewBox="0 0 24 24" width="13" height="13"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn-icon btn-danger-icon" onclick="deleteMember(${m.id})" title="Deactivate">
+            <svg viewBox="0 0 24 24" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>` : ''}
+      </td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text3)">No members found</td></tr>`;
+}
+
+function searchMembers(q) { loadMembers(q); }
+
+async function openAddMember() {
+  if (currentUser.user_role !== 'admin') return;
+  editMemberId = null;
+  $('modal-member-title').textContent = 'Add Member';
+  ['m-name','m-email','m-role','m-dept','m-phone'].forEach(id => $(id).value = '');
+  $('m-user-role').value = 'member';
+  $('m-type').value = 'full-time';
+  $('m-status').value = 'active';
+  await loadDirectorOptions();
+  await loadMemberDirectorateOptions();
+  await loadMemberWorkspaceOptions();
+  toggleDirectorField();
+  openModal('modal-member');
+}
+
+async function openEditMember(id) {
+  if (currentUser.user_role !== 'admin') return;
+  editMemberId = id;
+  $('modal-member-title').textContent = 'Edit Member';
+  const m = await api(`members.php?id=${id}`);
+  if (!m) return;
+  $('m-name').value      = m.name;
+  $('m-email').value     = m.email;
+  $('m-role').value      = m.role || '';
+  $('m-dept').value      = m.department || '';
+  $('m-type').value      = m.employment_type;
+  $('m-status').value    = m.status;
+  $('m-phone').value     = m.phone || '';
+  $('m-user-role').value = m.user_role;
+  await loadDirectorOptions(m.director_id);
+  await loadMemberDirectorateOptions(m.directorate_id);
+  await loadMemberWorkspaceOptions(m.workspace_id);
+  toggleDirectorField();
+  openModal('modal-member');
+}
+
+async function loadDirectorOptions(selectedId = '') {
+  const directors = await api('members.php?user_role=director') || [];
+  $('m-director').innerHTML = '<option value="">— None —</option>' +
+    directors.map(d => `<option value="${d.id}" ${d.id == selectedId ? 'selected' : ''}>${escHtml(d.name)}</option>`).join('');
+}
+
+function toggleDirectorField() {
+  const role = $('m-user-role').value;
+  $('director-field').style.display = role === 'member' ? '' : 'none';
+}
+
+async function saveMember() {
+  const body = {
+    name: $('m-name').value, email: $('m-email').value,
+    role: $('m-role').value, department: $('m-dept').value,
+    user_role: $('m-user-role').value, director_id: $('m-director').value,
+    directorate_id: $('m-directorate').value, workspace_id: $('m-workspace').value,
+    employment_type: $('m-type').value, status: $('m-status').value,
+    phone: $('m-phone').value
+  };
+  if (!body.name || !body.email) return toast('Name and email required', 'err');
+  if (editMemberId) {
+    await api(`members.php?id=${editMemberId}`, { method: 'PUT', body });
+    toast('Member updated');
+    closeModal('modal-member');
+  } else {
+    const res = await api('members.php', { method: 'POST', body });
+    if (!res) return;
+    closeModal('modal-member');
+    $('cred-email').textContent = res.email;
+    $('cred-pass').textContent  = res.temp_password;
+    openModal('modal-creds');
+  }
+  loadMembers();
+}
+
+async function deleteMember(id) {
+  if (!confirm('Deactivate this member?')) return;
+  await api(`members.php?id=${id}`, { method: 'DELETE' });
+  toast('Member deactivated');
+  loadMembers();
+}
+
+function copyCredentials() {
+  const text = `Email: ${$('cred-email').textContent}\nPassword: ${$('cred-pass').textContent}`;
+  navigator.clipboard.writeText(text).then(() => toast('Copied to clipboard'));
+}
+
+// ── SHIFTS ─────────────────────────────────────────────────────────────
+async function loadShifts() {
+  const date   = $('shift-date-filter').value || new Date().toISOString().split('T')[0];
+  const shifts = await api(`shifts.php?date=${date}`) || [];
+  $('shifts-list').innerHTML = shifts.length ? shifts.map(s =>
+    `<div class="row-item">
+       ${av(s.member_name, s.avatar_color, 'av-sm')}
+       <div style="flex:1"><div class="row-name">${escHtml(s.member_name)} <span style="color:var(--text3);font-weight:400;font-size:12px">${escHtml(s.member_role || '')}</span></div></div>
+       <span style="font-size:12px;color:var(--text2);min-width:110px">${fmtT(s.start_time)} – ${fmtT(s.end_time)}</span>
+       ${statusBadge(s.status)}
+       ${currentUser.user_role !== 'member' ? `<button class="btn-icon btn-danger-icon" onclick="deleteShift(${s.id})">
+         <svg viewBox="0 0 24 24" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+       </button>` : ''}
+     </div>`
+  ).join('') : '<div style="color:var(--text3);font-size:13px;padding:8px 0">No shifts for this date</div>';
+}
+
+async function openAddShift() {
+  if (!allMembers.length) allMembers = await api('members.php') || [];
+  $('sh-member').innerHTML = '<option value="">— Select member —</option>' +
+    allMembers.map(m => `<option value="${m.id}">${escHtml(m.name)}</option>`).join('');
+  $('sh-date').value = $('shift-date-filter').value || new Date().toISOString().split('T')[0];
+  openModal('modal-shift');
+}
+
+async function saveShift() {
+  const body = { member_id: $('sh-member').value, shift_date: $('sh-date').value, start_time: $('sh-start').value, end_time: $('sh-end').value, status: $('sh-status').value };
+  if (!body.member_id) return toast('Select a member', 'err');
+  await api('shifts.php', { method: 'POST', body });
+  toast('Shift added'); closeModal('modal-shift'); loadShifts();
+}
+
+async function deleteShift(id) {
+  if (!confirm('Remove this shift?')) return;
+  await api(`shifts.php?id=${id}`, { method: 'DELETE' });
+  toast('Shift removed'); loadShifts();
+}
+
+// ── TASKS ──────────────────────────────────────────────────────────────
+async function loadTasks() {
+  const tasks = await api('tasks.php') || [];
+  $('tasks-list').innerHTML = tasks.length ? tasks.map(t =>
+    `<div class="task-item" onclick="openTaskDetail(${t.id})" style="cursor:pointer">
+       <div class="check-circle ${t.status === 'completed' ? 'done' : ''}" onclick="event.stopPropagation(); openTaskDetail(${t.id})"></div>
+       <div style="flex:1">
+         <div class="task-title ${t.status === 'completed' ? 'done' : ''}">${escHtml(t.title)}</div>
+         <div class="task-meta">
+           <span class="dot dot-${t.priority === 'high' ? 'high' : t.priority === 'medium' ? 'med' : 'low'}"></span>
+           ${t.priority}${t.due_date ? ' · ' + fmt(t.due_date) : ''}${taskAssignInfo(t)} · ${statusBadge(t.status)}
+         </div>
+       </div>
+       ${currentUser.user_role !== 'member' ? `<button class="btn-icon btn-danger-icon" onclick="deleteTask(${t.id})">
+         <svg viewBox="0 0 24 24" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+       </button>` : ''}
+     </div>`
+  ).join('') : '<div style="color:var(--text3);font-size:13px;padding:8px 0">No tasks yet.</div>';
+}
+
+async function openAddTask() {
+  if (currentUser.user_role === 'member') return;
+  if (!allMembers.length) allMembers = await api('members.php') || [];
+  $('t-assigned').innerHTML = '<option value="">— Unassigned —</option>' +
+    allMembers.map(m => `<option value="${m.id}">${escHtml(m.name)}</option>`).join('');
+  await loadTaskDirectorateOptions();
+  $('t-title').value = '';
+  $('t-due').value   = new Date().toISOString().split('T')[0];
+  $('t-priority').value = 'medium';
+  $('t-status').value   = 'pending';
+  // reset assign type to member
+  $('t-type-member').checked = true;
+  toggleTaskAssignType();
+  openModal('modal-task');
+}
+
+async function saveTask() {
+  const assignType = document.querySelector('input[name="t-assign-type"]:checked')?.value || 'member';
+  const body = {
+    title:                   $('t-title').value,
+    assigned_to:             assignType === 'member'      ? $('t-assigned').value    : '',
+    assigned_directorate_id: assignType === 'directorate' ? $('t-directorate').value : '',
+    due_date:  $('t-due').value,
+    priority:  $('t-priority').value,
+    status:    $('t-status').value
+  };
+  if (!body.title) return toast('Title required', 'err');
+  if (assignType === 'directorate' && !body.assigned_directorate_id)
+    return toast('Please select a directorate', 'err');
+  await api('tasks.php', { method: 'POST', body });
+  toast('Task created'); closeModal('modal-task'); loadTasks();
+}
+
+async function openTaskDetail(id) {
+  const task = await api(`tasks.php?id=${id}`);
+  if (!task) return;
+  taskDetailId = id;
+  $('task-detail-title').textContent = task.title || 'Task details';
+  $('task-detail-meta').textContent = `${task.priority || 'medium'} priority${task.due_date ? ' · due ' + fmt(task.due_date) : ''}${task.assigned_name ? ' · ' + task.assigned_name : ''}`;
+  $('task-detail-status').value = task.status || 'pending';
+  $('task-detail-plan').value = task.work_plan || '';
+  $('task-detail-close').value = task.closing_note || '';
+  openModal('modal-task-detail');
+}
+
+async function saveTaskProgress() {
+  if (!taskDetailId) return;
+  const status = $('task-detail-status').value;
+  const workPlan = $('task-detail-plan').value.trim();
+  const closingNote = $('task-detail-close').value.trim();
+  if (status === 'completed' && !closingNote) return toast('Closing statement is required before marking this task done.', 'err');
+  const res = await api(`tasks.php?id=${taskDetailId}`, { method: 'POST', body: { action: 'update_progress', status, work_plan: workPlan, closing_note: closingNote } });
+  if (!res) return;
+  toast(status === 'completed' ? 'Task marked done' : 'Task updated');
+  closeModal('modal-task-detail');
+  loadTasks();
+  loadDashboard();
+}
+
+async function markTaskDone() {
+  if (!taskDetailId) return;
+  const closingNote = $('task-detail-close').value.trim();
+  if (!closingNote) return toast('Closing statement is required before marking this task done.', 'err');
+  const res = await api(`tasks.php?id=${taskDetailId}`, { method: 'POST', body: { action: 'update_progress', status: 'completed', work_plan: $('task-detail-plan').value.trim(), closing_note: closingNote } });
+  if (!res) return;
+  toast('Task marked done');
+  closeModal('modal-task-detail');
+  loadTasks();
+  loadDashboard();
+}
+
+async function toggleTask(id, el) {
+  const res = await api(`tasks.php?id=${id}`, { method: 'POST', body: { toggle: true } });
+  if (!res) return;
+  el.classList.toggle('done', res.status === 'completed');
+  const title = el.nextElementSibling?.querySelector('.task-title');
+  if (title) title.classList.toggle('done', res.status === 'completed');
+  toast(res.status === 'completed' ? 'Task completed!' : 'Task reopened');
+}
+
+async function deleteTask(id) {
+  if (!confirm('Delete this task?')) return;
+  await api(`tasks.php?id=${id}`, { method: 'DELETE' });
+  toast('Task deleted'); loadTasks();
+}
+
+// ── ATTENDANCE ─────────────────────────────────────────────────────────
+async function loadAttendance() {
+  const date = $('att-date-filter').value || new Date().toISOString().split('T')[0];
+  const rows = await api(`attendance.php?date=${date}`) || [];
+  $('att-body').innerHTML = rows.length ? rows.map(r => {
+    const active = r.clock_in && !r.clock_out;
+    const badge  = r.clock_out ? 'badge-green' : (active ? 'badge-amber' : 'badge-gray');
+    const label  = r.clock_out ? 'Completed' : (active ? 'Working' : 'Absent');
+    const noteCell = note => note
+      ? `<span title="${escHtml(note)}" style="cursor:default">${escHtml(note.length > 45 ? note.substring(0, 45) + '…' : note)}</span>`
+      : `<span style="color:var(--text3)">—</span>`;
+    return `<tr class="table-row">
+      <td><div class="name-cell">${av(r.member_name, r.avatar_color, 'av-sm')} ${escHtml(r.member_name)}</div></td>
+      <td>${fmtDT(r.clock_in)}</td>
+      <td>${fmtDT(r.clock_out)}</td>
+      <td>${active ? '<span style="color:var(--amber)">In progress</span>' : fmtDur(r.work_minutes)}</td>
+      <td><span class="badge ${badge}">${label}</span></td>
+      <td style="max-width:200px;font-size:12px">${noteCell(r.task_note)}</td>
+      <td style="max-width:200px;font-size:12px">${noteCell(r.achievement_note)}</td>
+    </tr>`;
+  }).join('')
+  : `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text3)">No attendance records for this date</td></tr>`;
+}
+
+// ── MESSAGES ───────────────────────────────────────────────────────────
+async function loadMessages(scrollToBottom) {
+  try {
+    const msgs = await api('messages.php');
+    if (!Array.isArray(msgs)) return;
+
+    const list = $('msg-list');
+    const atBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 80;
+
+    if (msgs.length === 0) {
+      list.innerHTML = `<div class="msg-empty">
+        <svg viewBox="0 0 24 24" width="48" height="48"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <span>No messages yet — say hello to the team!</span>
+      </div>`;
+    } else {
+      list.innerHTML = msgs.map((m, i) => {
+        const isMe  = m.member_id == currentUser.id;
+        const dt    = new Date(m.created_at.replace(' ', 'T'));
+        const time  = dt.toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit' });
+        const color = m.avatar_color || nameToColor(m.sender_name || '?');
+        return `<div class="msg ${isMe ? 'me' : 'them'}" style="animation-delay:${Math.min(i * 0.025, 0.35)}s">
+          ${!isMe ? `<div class="av av-sm" style="background:${color}">${initials(m.sender_name)}</div>` : ''}
+          <div>
+            <div class="bubble">${renderMessageText(m.content)}</div>
+            <div class="msg-meta">${!isMe ? escHtml(m.sender_name) + ' · ' : ''}${time}</div>
+          </div>
+        </div>`;
+      }).join('');
+
+      // Show unread badge when user is on another page
+      const newestId = Math.max(...msgs.map(m => +m.id));
+      if (currentPage !== 'messages' && newestId > lastMsgId && lastMsgId > 0) {
+        const count = msgs.filter(m => +m.id > lastMsgId).length;
+        const badge = $('msg-nav-badge');
+        badge.textContent = count > 9 ? '9+' : count;
+        badge.classList.add('show');
+      }
+      if (newestId > lastMsgId) lastMsgId = newestId;
+    }
+
+    if (scrollToBottom || atBottom) list.scrollTop = list.scrollHeight;
+  } catch (_) {
+    // Silently ignore poll errors to avoid toast spam
+  }
+}
+
+function startMsgPolling() {
+  // Clear unread badge when entering messages
+  const badge = $('msg-nav-badge');
+  badge.classList.remove('show');
+  stopMsgPolling();
+  loadMessages(true);
+  msgPollTimer = setInterval(() => loadMessages(), 5000);
+}
+
+function stopMsgPolling() {
+  if (msgPollTimer) { clearInterval(msgPollTimer); msgPollTimer = null; }
+}
+
+async function refreshNotificationBadge() {
+  try {
+    const data = await api('notifications.php?action=count');
+    const count = Number(data?.count || 0);
+    const badge = $('notif-nav-badge');
+    badge.textContent = count > 9 ? '9+' : count;
+    badge.classList.toggle('show', count > 0);
+  } catch (_) {}
+}
+
+async function loadNotifications() {
+  try {
+    const rows = await api('notifications.php') || [];
+    const list = $('notifications-list');
+    list.innerHTML = rows.length ? rows.map(n => `
+      <div class="notif-card ${n.is_read ? '' : 'unread'}">
+        <div class="notif-icon">${(n.type || 'N').charAt(0).toUpperCase()}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">
+            <strong style="font-size:13px">${escHtml(n.title || 'Notification')}</strong>
+            <span style="font-size:11px;color:var(--text3)">${fmtDT(n.created_at)}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text2);margin-top:4px">${escHtml(n.body || '')}</div>
+        </div>
+      </div>
+    `).join('') : '<div style="color:var(--text3);font-size:13px;padding:16px 0">No notifications yet.</div>';
+    await refreshNotificationBadge();
+  } catch (_) {}
+}
+
+async function markNotificationsRead() {
+  await api('notifications.php', { method: 'POST', body: { action: 'mark_read' } });
+  await loadNotifications();
+}
+
+async function sendMsg() {
+  const inp     = $('msg-in');
+  const content = inp.value.trim();
+  if (!content) return;
+  inp.value = '';
+  inp.focus();
+  try {
+    await api('messages.php', { method: 'POST', body: { content } });
+    await loadMessages(true);
+  } catch (_) {
+    inp.value = content; // restore on failure
+  }
+}
+
+// ── MODALS ─────────────────────────────────────────────────────────────
+function openModal(id)  { $(id).classList.add('open'); }
+function closeModal(id) { $(id).classList.remove('open'); }
+document.querySelectorAll('.modal-bg').forEach(m => m.addEventListener('click', e => {
+  if (e.target === m && m.id !== 'modal-task-today' && m.id !== 'modal-clock-out') m.classList.remove('open');
+}));
+// modal-task-today: background click intentionally blocked — member must submit
+$('modal-clock-out').addEventListener('click', e => { if (e.target === $('modal-clock-out')) cancelClockOut(); });
+
+// ── TASK ASSIGN HELPERS ────────────────────────────────────────────────
+function taskAssignInfo(t) {
+  if (t.directorate_name)
+    return ` · <span class="badge badge-dir">${escHtml(t.directorate_name)}</span>`;
+  if (t.assigned_name) return ` · ${escHtml(t.assigned_name)}`;
+  return '';
+}
+
+function toggleTaskAssignType() {
+  const type = document.querySelector('input[name="t-assign-type"]:checked')?.value || 'member';
+  $('t-member-field').style.display      = type === 'member'      ? '' : 'none';
+  $('t-directorate-field').style.display = type === 'directorate' ? '' : 'none';
+}
+
+async function loadTaskDirectorateOptions() {
+  const dirs = await api('directorates.php') || [];
+  $('t-directorate').innerHTML = '<option value="">— Select —</option>' +
+    dirs.map(d => `<option value="${d.id}">${escHtml(d.name)}</option>`).join('');
+}
+
+// ── DIRECTORATES ───────────────────────────────────────────────────────
+let allDirectorates  = [];
+let editDirectorateId = null;
+
+async function loadDirectorates() {
+  allDirectorates = await api('directorates.php') || [];
+  const el = $('directorates-list');
+  if (!allDirectorates.length) {
+    el.innerHTML = `<div style="color:var(--text3);font-size:13px;padding:20px 0;grid-column:1/-1">
+      No directorates yet. Click <b>Add Directorate</b> to create the first one.
+    </div>`;
+    return;
+  }
+  el.innerHTML = allDirectorates.map(d => `
+    <div class="dir-card">
+      <div class="dir-card-top">
+        <div>
+          <div class="dir-name">${escHtml(d.name)}</div>
+          ${d.description ? `<div class="dir-desc">${escHtml(d.description)}</div>` : ''}
+        </div>
+        ${currentUser.user_role === 'admin' ? `
+        <div class="dir-actions">
+          <button class="btn-icon" onclick="openEditDirectorate(${d.id})" title="Edit">
+            <svg viewBox="0 0 24 24" width="13" height="13"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn-icon btn-danger-icon" onclick="deleteDirectorate(${d.id})" title="Delete">
+            <svg viewBox="0 0 24 24" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>` : ''}
+      </div>
+      <div class="dir-footer">
+        ${d.director_name
+          ? `${av(d.director_name, d.director_color, 'av-sm')}
+             <span><b>Lead:</b> ${escHtml(d.director_name)}</span>`
+          : '<span style="color:var(--text3)">No team lead assigned</span>'}
+        <span style="margin-left:auto" class="badge badge-blue">
+          ${d.member_count} member${d.member_count != 1 ? 's' : ''}
+        </span>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function openAddDirectorate() {
+  editDirectorateId = null;
+  $('modal-dir-title').textContent = 'New Directorate';
+  $('dir-name').value = '';
+  $('dir-desc').value = '';
+  await loadDirLeadOptions();
+  $('dir-director').value = '';
+  openModal('modal-directorate');
+}
+
+async function openEditDirectorate(id) {
+  editDirectorateId = id;
+  $('modal-dir-title').textContent = 'Edit Directorate';
+  const d = allDirectorates.find(x => x.id == id);
+  if (!d) return;
+  $('dir-name').value = d.name;
+  $('dir-desc').value = d.description || '';
+  await loadDirLeadOptions(d.director_id);
+  openModal('modal-directorate');
+}
+
+async function saveDirectorate() {
+  const name = $('dir-name').value.trim();
+  if (!name) return toast('Name is required', 'err');
+  const body = { name, description: $('dir-desc').value, director_id: $('dir-director').value };
+  if (editDirectorateId) {
+    await api(`directorates.php?id=${editDirectorateId}`, { method: 'PUT', body });
+    toast('Directorate updated');
+  } else {
+    await api('directorates.php', { method: 'POST', body });
+    toast('Directorate created');
+  }
+  closeModal('modal-directorate');
+  loadDirectorates();
+}
+
+async function deleteDirectorate(id) {
+  if (!confirm('Delete this directorate? Members will be unlinked from it.')) return;
+  await api(`directorates.php?id=${id}`, { method: 'DELETE' });
+  toast('Directorate deleted');
+  loadDirectorates();
+}
+
+async function loadDirLeadOptions(selectedId = '') {
+  const directors = await api('members.php?user_role=director') || [];
+  $('dir-director').innerHTML = '<option value="">— None —</option>' +
+    directors.map(d => `<option value="${d.id}" ${d.id == selectedId ? 'selected' : ''}>${escHtml(d.name)}</option>`).join('');
+}
+
+async function loadMemberDirectorateOptions(selectedId = '') {
+  const dirs = await api('directorates.php') || [];
+  $('m-directorate').innerHTML = '<option value="">— None —</option>' +
+    dirs.map(d => `<option value="${d.id}" ${d.id == selectedId ? 'selected' : ''}>${escHtml(d.name)}</option>`).join('');
+}
+
+async function loadMemberWorkspaceOptions(selectedId = '') {
+  const workspaces = await api('workspaces.php') || [];
+  $('m-workspace').innerHTML = '<option value="">— None —</option>' +
+    workspaces.map(w => `<option value="${w.id}" ${w.id == selectedId ? 'selected' : ''}>${escHtml(w.name)}</option>`).join('');
+}
+
+let allWorkspaces = [];
+let editWorkspaceId = null;
+
+async function loadWorkspaces() {
+  allWorkspaces = await api('workspaces.php') || [];
+  const el = $('workspaces-list');
+  if (!allWorkspaces.length) {
+    el.innerHTML = `
+      <div class="dir-card">
+        <div class="dir-card-top">
+          <div>
+            <div class="dir-name">No workspaces yet</div>
+            <div class="dir-desc">Create a workspace to organize your team, projects, or departments.</div>
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
+  el.innerHTML = allWorkspaces.map(w => `
+      <div class="dir-card">
+        <div class="dir-card-top">
+          <div>
+            <div class="dir-name">${escHtml(w.name)}</div>
+            <div class="dir-desc">${escHtml(w.description || 'No description yet')}</div>
+          </div>
+          <div class="dir-actions">
+            <button class="btn-icon" onclick="openEditWorkspace(${w.id})" title="Edit">
+              <svg viewBox="0 0 24 24" width="16" height="16"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="btn-icon btn-danger-icon" onclick="deleteWorkspace(${w.id})" title="Delete">
+              <svg viewBox="0 0 24 24" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="dir-footer">
+          <span>${w.member_count || 0} member${w.member_count === 1 ? '' : 's'}</span>
+          <span>Created by ${escHtml(w.creator_name || 'Unknown')}</span>
+        </div>
+      </div>`).join('');
+}
+
+async function openAddWorkspace() {
+  editWorkspaceId = null;
+  $('modal-workspace-title').textContent = 'New Workspace';
+  $('ws-name').value = '';
+  $('ws-desc').value = '';
+  openModal('modal-workspace');
+}
+
+async function openEditWorkspace(id) {
+  editWorkspaceId = id;
+  const w = allWorkspaces.find(x => x.id == id);
+  if (!w) return;
+  $('modal-workspace-title').textContent = 'Edit Workspace';
+  $('ws-name').value = w.name;
+  $('ws-desc').value = w.description || '';
+  openModal('modal-workspace');
+}
+
+async function saveWorkspace() {
+  const name = $('ws-name').value.trim();
+  if (!name) return toast('Workspace name is required', 'err');
+  const body = { name, description: $('ws-desc').value.trim() };
+  if (editWorkspaceId) {
+    await api(`workspaces.php?id=${editWorkspaceId}`, { method: 'PUT', body });
+    toast('Workspace updated');
+  } else {
+    await api('workspaces.php', { method: 'POST', body });
+    toast('Workspace created');
+  }
+  closeModal('modal-workspace');
+  loadWorkspaces();
+}
+
+async function deleteWorkspace(id) {
+  if (!confirm('Delete this workspace? Members assigned to it will be unlinked.')) return;
+  await api(`workspaces.php?id=${id}`, { method: 'DELETE' });
+  toast('Workspace deleted');
+  loadWorkspaces();
+}
+
+// ── REQUESTS ───────────────────────────────────────────────────────────
+const REQ_TYPES = {
+  annual_leave:    { label: 'Annual Leave',    cls: 'badge-blue' },
+  sick_leave:      { label: 'Sick Leave',       cls: 'badge-amber' },
+  emergency_leave: { label: 'Emergency',        cls: 'badge-red' },
+  maternity_leave: { label: 'Maternity Leave',  cls: 'badge-purple' },
+  paternity_leave: { label: 'Paternity Leave',  cls: 'badge-purple' },
+  short_break:     { label: 'Short Break',      cls: 'badge-green' },
+  other:           { label: 'Other',            cls: 'badge-gray' }
+};
+
+function reqTypeBadge(type) {
+  const t = REQ_TYPES[type] || { label: type, cls: 'badge-gray' };
+  return `<span class="badge ${t.cls}">${t.label}</span>`;
+}
+
+function reqDateRange(r) {
+  if (r.type === 'short_break') return fmt(r.start_date);
+  if (r.end_date && r.end_date !== r.start_date)
+    return `${fmt(r.start_date)} → ${fmt(r.end_date)}`;
+  return fmt(r.start_date);
+}
+
+async function loadRequests() {
+  const role   = currentUser.user_role;
+  const tabsEl = $('req-tabs');
+
+  if (role !== 'member') {
+    // Render tabs (once; just update active state on re-render)
+    if (!tabsEl.children.length) {
+      tabsEl.innerHTML = ['all','pending','approved','rejected'].map(f =>
+        `<div class="req-tab" data-filter="${f}" onclick="filterRequests('${f}')">${f.charAt(0).toUpperCase()+f.slice(1)}</div>`
+      ).join('');
+    }
+    tabsEl.style.display = '';
+    tabsEl.querySelectorAll('.req-tab').forEach(t =>
+      t.classList.toggle('active', t.dataset.filter === reqCurrentFilter)
+    );
+  } else {
+    tabsEl.style.display = 'none';
+  }
+
+  const url = reqCurrentFilter !== 'all'
+    ? `requests.php?status=${reqCurrentFilter}` : 'requests.php';
+  allRequests = await api(url) || [];
+  renderRequests(allRequests);
+
+  // Refresh badge so it stays in sync
+  const count = allRequests.filter(r => r.status === 'pending').length;
+  if (role !== 'member') {
+    const b = $('req-nav-badge');
+    b.textContent = count > 9 ? '9+' : count;
+    b.classList.toggle('show', count > 0);
+  }
+}
+
+function filterRequests(filter) {
+  reqCurrentFilter = filter;
+  loadRequests();
+}
+
+function renderRequests(list) {
+  const role = currentUser.user_role;
+  if (!list.length) {
+    $('requests-list').innerHTML =
+      `<div style="color:var(--text3);font-size:13px;padding:16px 0">No requests found.</div>`;
+    return;
+  }
+  $('requests-list').innerHTML = list.map(r => {
+    const isPending  = r.status === 'pending';
+    const canReview  = role !== 'member' && isPending;
+    const canCancel  = r.member_id == currentUser.id && isPending;
+    const sBadge     = isPending
+      ? '<span class="badge badge-amber">Pending</span>'
+      : r.status === 'approved'
+        ? '<span class="badge badge-green">Approved</span>'
+        : '<span class="badge badge-red">Rejected</span>';
+    const reviewInfo = (!isPending && r.reviewer_name)
+      ? `<span style="color:var(--text3)"> · Reviewed by <em>${escHtml(r.reviewer_name)}</em>${r.reviewer_notes ? ': ' + escHtml(r.reviewer_notes) : ''}</span>`
+      : '';
+    return `<div class="req-row">
+      ${av(r.member_name, r.avatar_color, 'av-sm')}
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:3px">
+          <span style="font-size:13.5px;font-weight:500">${escHtml(r.member_name)}</span>
+          ${reqTypeBadge(r.type)} ${sBadge}
+        </div>
+        <div style="font-size:12px;color:var(--text2)">
+          ${reqDateRange(r)}
+          ${r.reason ? ` · ${escHtml(r.reason.substring(0,90))}${r.reason.length>90?'…':''}` : ''}
+          ${reviewInfo}
+        </div>
+      </div>
+      <div class="req-actions">
+        ${canReview ? `<button class="btn btn-sm btn-ghost" onclick="openReviewRequest(${r.id})">Review</button>` : ''}
+        ${canCancel ? `<button class="btn-icon btn-danger-icon" onclick="cancelRequest(${r.id})" title="Cancel request">
+          <svg viewBox="0 0 24 24" width="13" height="13"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleReqEndDate() {
+  const isBreak = $('req-type').value === 'short_break';
+  $('req-end-wrap').style.display = isBreak ? 'none' : '';
+  $('req-start-lbl').textContent  = isBreak ? 'Date *' : 'From *';
+}
+
+function openAddRequest() {
+  $('req-type').value   = 'annual_leave';
+  $('req-start').value  = new Date().toISOString().split('T')[0];
+  $('req-end').value    = '';
+  $('req-reason').value = '';
+  toggleReqEndDate();
+  openModal('modal-request');
+}
+
+async function saveRequest() {
+  const body = {
+    type:       $('req-type').value,
+    start_date: $('req-start').value,
+    end_date:   $('req-end').value || '',
+    reason:     $('req-reason').value.trim()
+  };
+  if (!body.start_date) return toast('Start date required', 'err');
+  await api('requests.php', { method: 'POST', body });
+  toast('Request submitted!');
+  closeModal('modal-request');
+  loadRequests();
+}
+
+function openReviewRequest(id) {
+  reviewingReqId = id;
+  const r = allRequests.find(x => x.id == id);
+  if (!r) return;
+  $('review-req-info').innerHTML = `
+    <div><b>Member:</b> ${escHtml(r.member_name)}</div>
+    <div><b>Type:</b>&nbsp; ${reqTypeBadge(r.type)}</div>
+    <div><b>Date:</b>&nbsp;&nbsp; ${reqDateRange(r)}</div>
+    ${r.reason ? `<div><b>Reason:</b> ${escHtml(r.reason)}</div>` : ''}
+  `;
+  $('review-notes').value = '';
+  openModal('modal-review');
+}
+
+async function submitReview(action) {
+  if (!reviewingReqId) return;
+  await api(`requests.php?id=${reviewingReqId}`, {
+    method: 'POST',
+    body: { action, notes: $('review-notes').value.trim() }
+  });
+  toast(action === 'approve' ? '✓ Request approved' : 'Request rejected');
+  closeModal('modal-review');
+  reviewingReqId = null;
+  loadRequests();
+}
+
+async function cancelRequest(id) {
+  if (!confirm('Cancel this request?')) return;
+  await api(`requests.php?id=${id}`, { method: 'DELETE' });
+  toast('Request cancelled');
+  loadRequests();
+}
+
+// ── LOADERS MAP ────────────────────────────────────────────────────────
+const loaders = {
+  dashboard:    loadDashboard,
+  members:      loadMembers,
+  shifts:       loadShifts,
+  tasks:        loadTasks,
+  attendance:   loadAttendance,
+  messages:     startMsgPolling,
+  notifications: loadNotifications,
+  directorates: loadDirectorates,
+  workspaces:   loadWorkspaces,
+  requests:     loadRequests
+};
+
+// ── INIT ───────────────────────────────────────────────────────────────
+$('shift-date-filter').value  = new Date().toISOString().split('T')[0];
+$('att-date-filter').value    = new Date().toISOString().split('T')[0];
+$('action-btn').style.display = 'none';
+init();
+</script>
+</body>
+</html>

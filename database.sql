@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS workspaces (
   id          INT AUTO_INCREMENT PRIMARY KEY,
   name        VARCHAR(100)  NOT NULL,
   description VARCHAR(255)  DEFAULT '',
+  logo_url    VARCHAR(255)  DEFAULT NULL,
   created_by  INT           NULL,
   created_at  TIMESTAMP     DEFAULT CURRENT_TIMESTAMP
 );
@@ -47,17 +48,47 @@ CREATE TABLE IF NOT EXISTS members (
 );
 
 -- 3. Add the circular FK: directorates.director_id → members.id
-ALTER TABLE directorates
-  ADD CONSTRAINT fk_directorate_director
-  FOREIGN KEY (director_id) REFERENCES members(id) ON DELETE SET NULL;
+SET @cnt = (
+  SELECT COUNT(*)
+  FROM information_schema.TABLE_CONSTRAINTS
+  WHERE CONSTRAINT_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'directorates'
+    AND CONSTRAINT_NAME = 'fk_directorate_director'
+    AND CONSTRAINT_TYPE = 'FOREIGN KEY'
+);
+SELECT IF(@cnt = 0,
+  'ALTER TABLE directorates ADD CONSTRAINT fk_directorate_director FOREIGN KEY (director_id) REFERENCES members(id) ON DELETE SET NULL',
+  'SELECT "fk_directorate_director already exists"'
+) INTO @sql;
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
-ALTER TABLE directorates
-  ADD CONSTRAINT fk_directorate_created_by
-  FOREIGN KEY (created_by)  REFERENCES members(id) ON DELETE SET NULL;
+SET @cnt = (
+  SELECT COUNT(*)
+  FROM information_schema.TABLE_CONSTRAINTS
+  WHERE CONSTRAINT_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'directorates'
+    AND CONSTRAINT_NAME = 'fk_directorate_created_by'
+    AND CONSTRAINT_TYPE = 'FOREIGN KEY'
+);
+SELECT IF(@cnt = 0,
+  'ALTER TABLE directorates ADD CONSTRAINT fk_directorate_created_by FOREIGN KEY (created_by) REFERENCES members(id) ON DELETE SET NULL',
+  'SELECT "fk_directorate_created_by already exists"'
+) INTO @sql;
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
-ALTER TABLE workspaces
-  ADD CONSTRAINT fk_workspace_created_by
-  FOREIGN KEY (created_by) REFERENCES members(id) ON DELETE SET NULL;
+SET @cnt = (
+  SELECT COUNT(*)
+  FROM information_schema.TABLE_CONSTRAINTS
+  WHERE CONSTRAINT_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'workspaces'
+    AND CONSTRAINT_NAME = 'fk_workspace_created_by'
+    AND CONSTRAINT_TYPE = 'FOREIGN KEY'
+);
+SELECT IF(@cnt = 0,
+  'ALTER TABLE workspaces ADD CONSTRAINT fk_workspace_created_by FOREIGN KEY (created_by) REFERENCES members(id) ON DELETE SET NULL',
+  'SELECT "fk_workspace_created_by already exists"'
+) INTO @sql;
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 -- 4. Shifts
 CREATE TABLE IF NOT EXISTS shifts (
