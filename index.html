@@ -3,425 +3,685 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>TeamFlow</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<title>TeamFlow — Premium Workspace Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
+
 :root{
-  --brand:#5C6BC0;--brand-dark:#3949AB;--brand-light:#E8EAF6;
-  --bg:#F5F6FA;--white:#fff;--surface:#fff;
-  --border:#E4E6EF;--border2:#C5CAE9;
-  --text:#1A1D2E;--text2:#6B7280;--text3:#9CA3AF;
-  --green:#10B981;--green-bg:#D1FAE5;
-  --amber:#F59E0B;--amber-bg:#FEF3C7;
-  --red:#EF4444;--red-bg:#FEE2E2;
-  --blue:#3B82F6;--blue-bg:#DBEAFE;
-  --radius:10px;--radius-sm:6px;
+  --bg:#07070F;
+  --bg2:#0E0E1C;
+  --surface:rgba(255,255,255,0.035);
+  --surface-hov:rgba(255,255,255,0.065);
+  --border:rgba(255,255,255,0.08);
+  --border-gold:rgba(201,168,76,0.32);
+  --gold:#C9A84C;
+  --gold-l:#F0C870;
+  --gold-d:#9A7A2E;
+  --text:#F3F3F6;
+  --text2:rgba(243,243,246,0.58);
+  --text3:rgba(243,243,246,0.32);
+  --purple:#8B7FD4;
+  --green:#34D399;
+  --red:#F87171;
+  --r:16px;
+  --r-sm:10px;
+  --r-lg:28px;
 }
 
-/* ── BASE ──────────────────────────────────────────────────────────────── */
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;height:100vh;overflow:hidden;display:flex}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{
+  font-family:'Inter',sans-serif;background:var(--bg);
+  color:var(--text);font-size:15px;min-height:100vh;overflow-x:hidden;
+}
 
-/* ── SIDEBAR ─────────────────────────────────────────────────────────── */
-.sidebar{width:210px;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:transform .28s cubic-bezier(.4,0,.2,1)}
-.logo{display:flex;align-items:center;gap:10px;padding:20px 18px;border-bottom:1px solid var(--border)}
-.logo-box{width:32px;height:32px;border-radius:8px;object-fit:contain;flex-shrink:0}
-.logo-text{font-size:16px;font-weight:600}
-nav{padding:12px 10px;flex:1;overflow-y:auto}
-.nav-item{position:relative;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);color:var(--text2);cursor:pointer;font-size:13.5px;font-weight:500;margin-bottom:2px;transition:all .18s cubic-bezier(.4,0,.2,1);-webkit-user-select:none;user-select:none}
-.nav-item:hover{background:var(--bg);color:var(--text);transform:translateX(2px)}
-.nav-item.active{background:var(--brand-light);color:var(--brand-dark)}
-.nav-item svg{width:16px;height:16px;flex-shrink:0;transition:transform .18s}
-.nav-item:hover svg{transform:scale(1.12)}
-.nav-label{flex:1}
-.nav-badge{position:absolute;top:7px;right:10px;background:var(--red);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:none;align-items:center;justify-content:center;padding:0 4px;animation:badgePop .3s cubic-bezier(.34,1.56,.64,1)}
-.nav-badge.show{display:flex}
-.sidebar-footer{padding:14px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.user-av{width:32px;height:32px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;transition:transform .2s}
-.user-av:hover{transform:scale(1.08)}
-.user-info{flex:1;min-width:0}
-.user-info .name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.user-info .urole{font-size:11px;color:var(--text3)}
-.logout-btn{background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;border-radius:4px;display:flex;align-items:center;transition:all .15s}
-.logout-btn:hover{color:var(--red);background:var(--red-bg)}
+/* ── BACKGROUND ── */
+.bg-orb{
+  position:fixed;border-radius:50%;filter:blur(110px);
+  pointer-events:none;z-index:0;will-change:transform;
+}
+.orb-1{
+  width:780px;height:780px;top:-260px;left:-260px;opacity:.28;
+  background:radial-gradient(circle,rgba(139,127,212,.55) 0%,transparent 70%);
+  animation:o1 22s ease-in-out infinite;
+}
+.orb-2{
+  width:640px;height:640px;top:35%;right:-180px;opacity:.22;
+  background:radial-gradient(circle,rgba(201,168,76,.38) 0%,transparent 70%);
+  animation:o2 28s ease-in-out infinite;
+}
+.orb-3{
+  width:520px;height:520px;bottom:-80px;left:28%;opacity:.18;
+  background:radial-gradient(circle,rgba(52,211,153,.22) 0%,transparent 70%);
+  animation:o3 20s ease-in-out infinite;
+}
+@keyframes o1{0%,100%{transform:translate(0,0) scale(1)}40%{transform:translate(70px,-50px) scale(1.09)}75%{transform:translate(-45px,65px) scale(.94)}}
+@keyframes o2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-90px,45px) scale(1.12)}}
+@keyframes o3{0%,100%{transform:translate(0,0)}45%{transform:translate(55px,-35px) scale(1.06)}85%{transform:translate(-35px,55px) scale(.96)}}
 
-/* ── SIDEBAR OVERLAY (mobile) ────────────────────────────────────────── */
-.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:90;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
-.sidebar-overlay.show{display:block;animation:fadeIn .2s ease}
+body::before{
+  content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E");
+  opacity:.5;
+}
 
-/* ── MAIN ────────────────────────────────────────────────────────────── */
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px}
-.topbar-left{display:flex;align-items:center;gap:10px;min-width:0}
-.page-title{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.topbar-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
-.hamburger{display:none;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;padding:7px;border-radius:var(--radius-sm);color:var(--text2);transition:all .15s;flex-shrink:0}
-.hamburger:hover{background:var(--bg);color:var(--text)}
-.content{flex:1;overflow-y:auto;padding:24px}
-.content::-webkit-scrollbar{width:5px}
-.content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+/* ── LAYOUT ── */
+.wrap{position:relative;z-index:2;max-width:1160px;margin:0 auto;padding:0 28px}
 
-/* ── PAGES ──────────────────────────────────────────────────────────── */
-.page{display:none}
-.page.active{display:block;animation:fadeUp .22s ease}
+/* ── NAV ── */
+nav.topnav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  padding:16px 0;
+  background:rgba(7,7,15,0.75);
+  -webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);
+  border-bottom:1px solid var(--border);
+}
+.nav-inner{
+  max-width:1160px;margin:0 auto;padding:0 28px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.nav-logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo-mark{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--gold) 0%,var(--purple) 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:15px;color:#0A0800;letter-spacing:-.5px;
+  box-shadow:0 4px 14px rgba(201,168,76,.3);
+}
+.logo-text{font-size:15.5px;font-weight:600;color:var(--text);letter-spacing:-.3px}
+.nav-btns{display:flex;gap:10px;align-items:center}
 
-/* ── ANIMATIONS ──────────────────────────────────────────────────────── */
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
-@keyframes slideInL{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
-@keyframes slideInR{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
-@keyframes scaleIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
-@keyframes popIn{0%{transform:scale(.5)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
-@keyframes badgePop{0%{transform:scale(0)}60%{transform:scale(1.35)}100%{transform:scale(1)}}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes msgIn{from{opacity:0;transform:translateY(6px) scale(.97)}to{opacity:1;transform:none}}
-
-.modal-bg.open .modal{animation:scaleIn .2s cubic-bezier(.34,1.2,.64,1)}
-.stat-card{transition:transform .2s ease,box-shadow .2s ease}
-.stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
-.check-circle.done{animation:popIn .25s ease}
-.toast.show{animation:slideInR .25s ease}
-
-/* ── BUTTONS ─────────────────────────────────────────────────────────── */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .16s}
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:10px 22px;border-radius:var(--r-sm);
+  font-size:13.5px;font-weight:500;cursor:pointer;border:none;
+  font-family:'Inter',sans-serif;transition:all .22s ease;
+  letter-spacing:.01em;text-decoration:none;
+}
 .btn:active{transform:scale(.96)}
-.btn-primary{background:var(--brand);color:#fff;box-shadow:0 1px 4px rgba(92,107,192,.3)}
-.btn-primary:hover{background:var(--brand-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(92,107,192,.4)}
-.btn-ghost{background:var(--white);color:var(--text2);border:1px solid var(--border)}
-.btn-ghost:hover{border-color:var(--border2);color:var(--text)}
-.btn-sm{padding:5px 12px;font-size:12px}
-.btn-icon{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 8px;cursor:pointer;color:var(--text2);display:inline-flex;align-items:center;transition:all .15s}
-.btn-icon:hover{background:var(--bg);color:var(--text);transform:scale(1.05)}
-.btn-danger-icon{border-color:#FECACA;color:var(--red)}.btn-danger-icon:hover{background:var(--red-bg)}
-  .landing-container{max-width:1120px;margin:0 auto;padding:42px 24px 80px;min-height:100vh;display:flex;flex-direction:column;gap:40px}
-  .hero-top{display:grid;grid-template-columns:1.1fr .9fr;gap:32px;align-items:center}
-  .hero-copy{max-width:620px}
-  .eyebrow{color:var(--brand);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.18em;margin-bottom:18px}
-  .hero-top h1{font-size:3rem;line-height:1.03;margin-bottom:18px;color:var(--text)}
-  .hero-text{font-size:1rem;line-height:1.85;color:var(--text2);max-width:560px;margin-bottom:24px}
-  .hero-actions{display:flex;flex-wrap:wrap;gap:12px}
-  .hero-visual{display:flex;justify-content:center}
-  .hero-card{background:var(--white);border:1px solid var(--border);border-radius:24px;padding:32px;max-width:420px;box-shadow:0 24px 60px rgba(92,107,192,.08)}
-  .hero-card .card-badge{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;background:var(--brand-light);color:var(--brand);font-size:12px;margin-bottom:14px}
-  .hero-card h2{font-size:1.5rem;margin-bottom:10px}
-  .hero-card p{color:var(--text2);line-height:1.75}
-  .features{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-  .feature-card{background:var(--white);border:1px solid var(--border);border-radius:20px;padding:24px;transition:transform .24s ease,box-shadow .24s ease}
-  .feature-card:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(92,107,192,.08)}
-  .feature-card h3{font-size:1.05rem;margin-bottom:10px}
-  .feature-card p{color:var(--text3);line-height:1.8;font-size:0.95rem}
-  .cta-section{display:grid;grid-template-columns:1.2fr .8fr;gap:28px;align-items:start;padding:32px 0 0}
-  .cta-copy h2{font-size:2rem;line-height:1.05;margin-bottom:14px}
-  .cta-copy p{color:var(--text2);line-height:1.8;max-width:540px}
-  .cta-form{display:flex;flex-direction:column;gap:14px;max-width:460px}
-  .workspace-result{font-size:14px;padding:14px 16px;border-radius:12px;border:1px solid transparent;line-height:1.6}
-  .workspace-result.success{background:var(--green-bg);color:#065f46;border-color:rgba(16,185,129,.2)}
-  .workspace-result.err{background:var(--red-bg);color:#991b1b;border-color:rgba(239,68,68,.2)}
-  .workspace-result a{color:var(--brand);text-decoration:underline}
-  .landing-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(2px);align-items:center;justify-content:center;z-index:100}
-  .landing-modal-bg.open{display:flex}
-  .landing-modal{background:var(--white);border-radius:20px;padding:28px;max-width:520px;width:95%;box-shadow:0 28px 80px rgba(15,23,42,.16)}
-  .landing-modal h2{font-size:1.4rem;margin-bottom:10px}
-  .landing-modal p{color:var(--text3);line-height:1.75;margin-bottom:18px}
-  .landing-modal .form-row{display:grid;gap:14px}
-  .landing-modal .fg input{background:var(--bg)}
-/* ── CARDS ───────────────────────────────────────────────────────────── */
-.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
-.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.card-title{font-size:14px;font-weight:600}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
-.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px;border-top:3px solid var(--brand)}
-.stat-card.g{border-top-color:var(--green)}.stat-card.a{border-top-color:var(--amber)}.stat-card.b{border-top-color:var(--blue)}
-.stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;font-weight:500}
-.stat-val{font-size:26px;font-weight:700;line-height:1;animation:fadeUp .4s ease}
-.stat-sub{font-size:11px;color:var(--text3);margin-top:4px}
+.btn-gold{
+  background:linear-gradient(130deg,var(--gold-d) 0%,var(--gold) 45%,var(--gold-l) 80%,var(--gold) 100%);
+  background-size:200% auto;
+  color:#1A1000;font-weight:600;
+  box-shadow:0 4px 22px rgba(201,168,76,.32);
+}
+.btn-gold:hover{background-position:right center;box-shadow:0 6px 32px rgba(201,168,76,.52);transform:translateY(-1px)}
+.btn-ghost{
+  background:transparent;color:var(--text2);
+  border:1px solid var(--border);
+}
+.btn-ghost:hover{border-color:rgba(255,255,255,.22);background:var(--surface-hov);color:var(--text);transform:translateY(-1px)}
+.btn-lg{padding:14px 32px;font-size:15px;border-radius:12px}
 
-/* ── BADGES ──────────────────────────────────────────────────────────── */
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
-.badge-green{background:var(--green-bg);color:#065F46}
-.badge-amber{background:var(--amber-bg);color:#92400E}
-.badge-red{background:var(--red-bg);color:#991B1B}
-.badge-blue{background:var(--blue-bg);color:#1E40AF}
-.badge-purple{background:var(--brand-light);color:var(--brand-dark)}
-.badge-gray{background:#F3F4F6;color:var(--text2)}
+/* ── HERO ── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+  padding:150px 0 90px;
+}
+.hero-inner{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
 
-/* ── ROWS & TABLE ────────────────────────────────────────────────────── */
-.row-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
-.row-item:last-child{border-bottom:none;padding-bottom:0}
-.row-item:first-child{padding-top:0}
-.row-name{font-size:13.5px;font-weight:500}.row-sub{font-size:12px;color:var(--text3);margin-top:1px}
-.row-actions{display:flex;gap:5px;margin-left:auto;opacity:0;transition:opacity .15s}
-.row-item:hover .row-actions,.table-row:hover .row-actions{opacity:1}
-.av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
-.av-sm{width:28px;height:28px;font-size:10px}
-.tbl{width:100%;border-collapse:collapse}
-.tbl th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);font-weight:500;padding:8px 12px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
-.tbl td{padding:11px 12px;border-bottom:1px solid var(--border);font-size:13.5px;color:var(--text2);vertical-align:middle}
-.tbl tr:last-child td{border-bottom:none}
-.table-row:hover td{background:#FAFAFA}
-.name-cell{color:var(--text);font-weight:500;display:flex;align-items:center;gap:10px}
+.eyebrow-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 16px;border-radius:999px;
+  border:1px solid var(--border-gold);background:rgba(201,168,76,.07);
+  color:var(--gold);font-size:12.5px;font-weight:500;
+  margin-bottom:28px;letter-spacing:.04em;
+}
+.pulse-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--gold);box-shadow:0 0 7px var(--gold);
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.75)}}
 
-/* ── TASKS ───────────────────────────────────────────────────────────── */
-.task-item{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}
-.task-item:last-child{border-bottom:none}
-.check-circle{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border2);cursor:pointer;flex-shrink:0;margin-top:1px;transition:all .2s;display:flex;align-items:center;justify-content:center}
-.check-circle:hover:not(.done){border-color:var(--brand);background:var(--brand-light)}
-.check-circle.done{background:var(--green);border-color:var(--green)}
-.check-circle.done::after{content:'✓';color:#fff;font-size:10px;font-weight:700}
-.task-title{font-size:13.5px;font-weight:500}.task-title.done{text-decoration:line-through;color:var(--text3)}
-.task-meta{font-size:11px;color:var(--text3);margin-top:3px;display:flex;gap:8px;align-items:center}
-.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}.dot-high{background:var(--red)}.dot-med{background:var(--amber)}.dot-low{background:var(--green)}
+.hero-h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.8rem,4.8vw,4.1rem);
+  font-weight:600;line-height:1.06;
+  margin-bottom:22px;letter-spacing:-.025em;color:var(--text);
+}
+.grad{
+  background:linear-gradient(128deg,var(--gold-l) 0%,var(--gold) 38%,var(--purple) 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+}
+.hero-sub{
+  font-size:1.05rem;line-height:1.82;
+  color:var(--text2);max-width:510px;margin-bottom:36px;font-weight:300;
+}
+.hero-ctas{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:42px}
+.trust-row{display:flex;align-items:center;gap:13px;font-size:13px;color:var(--text3)}
+.trust-avs{display:flex}
+.tav{
+  width:30px;height:30px;border-radius:50%;border:2px solid var(--bg);
+  background:linear-gradient(135deg,var(--purple),var(--gold-d));
+  margin-left:-9px;
+}
+.tav:first-child{margin-left:0}
+.tav:nth-child(2){background:linear-gradient(135deg,var(--gold),var(--purple))}
+.tav:nth-child(3){background:linear-gradient(135deg,var(--green),var(--purple))}
+.tav:nth-child(4){background:linear-gradient(135deg,var(--red),var(--gold))}
 
-/* ── MESSAGES ────────────────────────────────────────────────────────── */
-.msg-list{display:flex;flex-direction:column;gap:10px;padding:4px 0 16px;flex:1;overflow-y:auto;min-height:0}
-.msg-list::-webkit-scrollbar{width:4px}
-.msg-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-.msg{display:flex;gap:8px;align-items:flex-end;animation:msgIn .22s ease both}
-.msg.me{flex-direction:row-reverse}
-.bubble{max-width:70%;padding:9px 14px;border-radius:16px;font-size:13.5px;line-height:1.55;word-break:break-word}
-.msg.them .bubble{background:var(--bg);color:var(--text);border-bottom-left-radius:3px}
-.msg.me .bubble{background:var(--brand);color:#fff;border-bottom-right-radius:3px;box-shadow:0 2px 8px rgba(92,107,192,.22)}
-.msg-meta{font-size:11px;color:var(--text3);margin-top:4px;white-space:nowrap}
-.msg.me .msg-meta{text-align:right}
-.msg-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;color:var(--text3);font-size:13px;gap:10px;padding:40px 20px;animation:fadeUp .4s ease}
-.msg-empty svg{opacity:.25}
-.mention-chip{display:inline-block;background:var(--brand-light);color:var(--brand-dark);padding:1px 6px;border-radius:999px;font-weight:600}
-.notif-card{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
-.notif-card:last-child{border-bottom:none}
-.notif-icon{width:32px;height:32px;border-radius:10px;background:var(--brand-light);display:flex;align-items:center;justify-content:center;color:var(--brand-dark);font-size:13px;font-weight:700;flex-shrink:0}
-.notif-card.unread{background:linear-gradient(90deg, rgba(92,107,192,.06), transparent)}
-.msg-bar{display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--border);flex-shrink:0;align-items:center}
-.msg-input{flex:1;border:1px solid var(--border);border-radius:22px;padding:9px 16px;font-size:13.5px;font-family:'Inter',sans-serif;color:var(--text);outline:none;background:var(--bg);transition:border .15s,background .15s,box-shadow .15s}
-.msg-input:focus{border-color:var(--brand);background:var(--white);box-shadow:0 0 0 3px rgba(92,107,192,.1)}
-.msg-send-btn{width:38px;height:38px;min-width:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:all .18s}
-.msg-send-btn:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(92,107,192,.4)}
-.msg-send-btn:active{transform:scale(.93)}
+/* ── HERO CARD ── */
+.hero-visual{position:relative}
+.glass{
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:var(--r-lg);
+  padding:30px;
+  -webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);
+  box-shadow:0 36px 90px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.06);
+}
+.card-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:999px;
+  background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.22);
+  color:var(--gold);font-size:12px;font-weight:500;margin-bottom:20px;
+}
+.glass h2{
+  font-family:'Playfair Display',serif;
+  font-size:1.45rem;font-weight:500;line-height:1.38;
+  margin-bottom:14px;color:var(--text);
+}
+.glass p{color:var(--text2);line-height:1.8;font-size:13.5px;margin-bottom:24px}
+.mini-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:12px;padding-top:20px;border-top:1px solid var(--border);
+}
+.ms{text-align:center}
+.ms-val{
+  font-family:'Playfair Display',serif;
+  font-size:1.6rem;font-weight:600;color:var(--gold);line-height:1;
+}
+.ms-lbl{font-size:11px;color:var(--text3);margin-top:5px;letter-spacing:.04em}
 
-/* ── PROGRESS ────────────────────────────────────────────────────────── */
-.prog{height:5px;background:var(--bg);border-radius:3px;overflow:hidden;margin-top:6px}
-.prog-bar{height:100%;border-radius:3px;background:var(--brand);transition:width .6s cubic-bezier(.4,0,.2,1)}
+.float-badge{
+  position:absolute;border-radius:12px;
+  padding:10px 16px;display:flex;align-items:center;gap:9px;
+  font-size:13px;font-weight:500;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);will-change:transform;
+}
+.fb-green{
+  top:-22px;right:-22px;
+  background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.22);
+  color:var(--green);box-shadow:0 8px 32px rgba(52,211,153,.1);
+  animation:fbf 4s ease-in-out infinite;
+}
+.fb-purple{
+  bottom:-18px;left:-26px;
+  background:rgba(139,127,212,.1);border:1px solid rgba(139,127,212,.22);
+  color:var(--purple);box-shadow:0 8px 32px rgba(139,127,212,.1);
+  animation:fbf 4.8s ease-in-out infinite reverse;
+}
+@keyframes fbf{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
 
-/* ── MODAL ───────────────────────────────────────────────────────────── */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:50;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
-.modal-bg.open{display:flex;animation:fadeIn .15s ease}
-.modal{background:var(--white);border-radius:var(--radius);padding:24px;width:460px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.15)}
-.modal-title{font-size:16px;font-weight:600;margin-bottom:18px}
-.fg{margin-bottom:13px}
-.fg label{display:block;font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
-.fg input,.fg select{width:100%;border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 11px;font-size:13.5px;font-family:'Inter',sans-serif;color:var(--text);outline:none;transition:border .15s,box-shadow .15s}
-.fg input:focus,.fg select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(92,107,192,.1)}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+/* ── MARQUEE ── */
+.strip{
+  position:relative;z-index:2;
+  padding:26px 0;overflow:hidden;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+}
+.strip::before,.strip::after{
+  content:'';position:absolute;top:0;bottom:0;width:140px;z-index:2;
+}
+.strip::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
+.strip::after{right:0;background:linear-gradient(270deg,var(--bg),transparent)}
+.mq{
+  display:flex;gap:56px;align-items:center;
+  white-space:nowrap;width:max-content;
+  animation:mq 30s linear infinite;
+}
+.mq-item{
+  display:flex;align-items:center;gap:10px;
+  font-size:12.5px;color:var(--text3);font-weight:500;
+  text-transform:uppercase;letter-spacing:.07em;flex-shrink:0;
+}
+.mq-dot{width:4px;height:4px;border-radius:50%;background:var(--gold);opacity:.5}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-/* ── SEARCH / MISC ───────────────────────────────────────────────────── */
-.search{border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none;width:190px;transition:width .2s,border .15s}
-.search:focus{border-color:var(--brand);width:220px}
-.toast{position:fixed;bottom:20px;right:20px;background:var(--text);color:#fff;padding:10px 16px;border-radius:var(--radius-sm);font-size:13px;z-index:100;transform:translateY(10px);opacity:0;transition:all .25s;box-shadow:0 4px 16px rgba(0,0,0,.15);max-width:300px}
-.toast.show{transform:none;opacity:1}
-.toast.ok{border-left:3px solid var(--green)}.toast.err{border-left:3px solid var(--red)}
-.cred-box{background:var(--bg);border-radius:var(--radius-sm);padding:16px;margin:12px 0;font-size:13px;line-height:2}
-.cred-box b{color:var(--text)}
-.clock-card{text-align:center;padding:28px 20px}
-.clock-display{font-size:44px;font-weight:700;color:var(--brand);letter-spacing:-1px;margin-bottom:4px;font-variant-numeric:tabular-nums}
-.clock-status{font-size:13px;color:var(--text3);margin-bottom:20px}
-.clock-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;align-items:center}
-.clock-btn{padding:12px 32px;font-size:14px;border-radius:30px}
-.clock-pause-btn{padding:12px 20px;font-size:14px;border-radius:30px}
-.clock-summary{font-size:12px;color:var(--text3);margin-top:14px;min-height:18px}
-.clock-modal-hint{font-size:12px;color:var(--text3);margin-bottom:14px}
-svg{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+/* ── SECTION BASE ── */
+.sec-eyebrow{
+  display:inline-block;color:var(--gold);
+  font-size:11.5px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.15em;margin-bottom:14px;
+}
+.sec-h2{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,3.5vw,2.85rem);
+  font-weight:600;line-height:1.1;margin-bottom:14px;letter-spacing:-.018em;
+}
+.sec-sub{font-size:1rem;line-height:1.85;color:var(--text2);max-width:540px}
 
-/* ── RESPONSIVE ──────────────────────────────────────────────────────── */
+/* ── FEATURES ── */
+.features{padding:108px 0}
+.features-hd{text-align:center;margin-bottom:62px}
+.features-hd .sec-sub{margin:0 auto}
+.f-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.f-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:32px;
+  position:relative;overflow:hidden;
+  transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease,background .3s ease;
+}
+.f-card::before{
+  content:'';position:absolute;top:0;left:15%;right:15%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,168,76,.35),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.f-card:hover::before{opacity:1}
+.f-card:hover{
+  transform:translateY(-7px);
+  border-color:rgba(255,255,255,.13);
+  background:var(--surface-hov);
+  box-shadow:0 28px 70px rgba(0,0,0,.45);
+}
+.f-icon{
+  width:50px;height:50px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:22px;
+  background:linear-gradient(135deg,rgba(201,168,76,.14),rgba(139,127,212,.1));
+  border:1px solid rgba(201,168,76,.2);
+}
+.f-icon svg{width:22px;height:22px;fill:none;stroke:var(--gold);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.f-card h3{font-size:1.04rem;font-weight:600;margin-bottom:10px;color:var(--text);letter-spacing:-.01em}
+.f-card p{color:var(--text2);line-height:1.82;font-size:.91rem}
+
+/* ── CTA SECTION ── */
+.cta-sec{padding:108px 0 120px;position:relative;z-index:2}
+.cta-inner{display:grid;grid-template-columns:1.1fr .9fr;gap:64px;align-items:start}
+.cta-copy .sec-h2{font-size:2.45rem}
+.cta-desc{color:var(--text2);line-height:1.85;margin-top:16px;max-width:480px;font-size:.98rem}
+.perks{margin-top:32px;display:flex;flex-direction:column;gap:13px}
+.perk{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--text2)}
+.perk-ic{
+  width:22px;height:22px;border-radius:50%;flex-shrink:0;
+  background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--green);font-size:11px;font-weight:700;
+}
+
+/* ── FORM CARD ── */
+.form-glass{
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:36px;
+  -webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);
+  box-shadow:0 36px 90px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.05);
+  position:relative;overflow:hidden;
+}
+.form-glass::after{
+  content:'';position:absolute;top:0;left:18%;right:18%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,168,76,.45),transparent);
+}
+.form-glass h3{
+  font-family:'Playfair Display',serif;
+  font-size:1.38rem;font-weight:500;margin-bottom:6px;
+}
+.form-glass .f-sub{color:var(--text3);font-size:13.5px;margin-bottom:28px;line-height:1.6}
+
+.fg{margin-bottom:18px}
+.fg label{
+  display:block;font-size:11.5px;font-weight:500;
+  color:var(--text3);text-transform:uppercase;
+  letter-spacing:.07em;margin-bottom:7px;
+}
+.fg input{
+  width:100%;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:10px;
+  padding:11px 14px;font-size:14px;
+  font-family:'Inter',sans-serif;color:var(--text);
+  outline:none;
+  transition:border .2s,box-shadow .2s,background .2s;
+}
+.fg input::placeholder{color:rgba(243,243,246,0.22)}
+.fg input:focus{
+  border-color:rgba(201,168,76,.5);
+  background:rgba(255,255,255,0.075);
+  box-shadow:0 0 0 3px rgba(201,168,76,.12);
+}
+.fg input[type=file]{cursor:pointer}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.label-opt{color:var(--text3);text-transform:none;font-weight:400;letter-spacing:0}
+.btn-submit{width:100%;justify-content:center;padding:14px;font-size:14.5px;border-radius:10px;margin-top:4px}
+
+.ws-result{
+  font-size:13.5px;padding:13px 16px;
+  border-radius:10px;border:1px solid transparent;
+  line-height:1.7;margin-top:8px;display:none;
+}
+.ws-result.success{
+  background:rgba(52,211,153,.08);
+  color:#86efac;border-color:rgba(52,211,153,.2);display:block;
+}
+.ws-result.err{
+  background:rgba(248,113,113,.08);
+  color:#fca5a5;border-color:rgba(248,113,113,.2);display:block;
+}
+.ws-result a{color:var(--gold);text-decoration:underline}
+
+/* ── FOOTER ── */
+footer{
+  padding:36px 0;border-top:1px solid var(--border);
+  position:relative;z-index:2;
+}
+.foot{
+  max-width:1160px;margin:0 auto;padding:0 28px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
+}
+.foot-logo{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;color:var(--text)}
+.foot-mark{
+  width:28px;height:28px;border-radius:8px;font-size:12px;font-weight:700;color:#0A0800;
+  background:linear-gradient(135deg,var(--gold),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+}
+.foot-copy{font-size:12.5px;color:var(--text3)}
+
+/* ── SCROLL REVEAL ── */
+.reveal{
+  opacity:0;transform:translateY(22px);
+  transition:opacity .65s ease,transform .65s ease;
+}
+.reveal.in{opacity:1;transform:none}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+
+/* ── RESPONSIVE ── */
 @media(max-width:960px){
-  .stats-row{grid-template-columns:repeat(2,1fr)}
-  .two-col{grid-template-columns:1fr}
+  .hero-inner{grid-template-columns:1fr;gap:52px}
+  .hero-visual{display:none}
+  .f-grid{grid-template-columns:1fr 1fr}
+  .cta-inner{grid-template-columns:1fr;gap:52px}
 }
-@media(max-width:768px){
-  body{height:100dvh}
-  .sidebar{
-    position:fixed;top:0;left:0;bottom:0;z-index:100;
-    width:240px;
-    transform:translateX(-100%);
-    box-shadow:4px 0 24px rgba(0,0,0,.12);
-  }
-  .sidebar.open{transform:translateX(0)}
-  .hamburger{display:flex}
-  .main{height:100dvh;width:100%;overflow:hidden}
-  .topbar{height:52px;padding:0 14px}
-  .page-title{font-size:15px}
-  .content{padding:14px}
-  .stats-row{grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-  .stat-val{font-size:22px}
-  .card{padding:16px;margin-bottom:12px}
-  .two-col{grid-template-columns:1fr}
-  .form-row{grid-template-columns:1fr}
-  .modal{padding:20px}
-  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  #page-members .card{padding:0;overflow:hidden}
-  #page-messages .card{height:calc(100dvh - 108px)}
-  .search{width:130px}
-  .search:focus{width:155px}
-  .clock-display{font-size:36px}
-  .clock-btn{padding:10px 26px}
+@media(max-width:640px){
+  .wrap{padding:0 18px}
+  .nav-inner{padding:0 18px}
+  .hero{padding:120px 0 64px}
+  .hero-ctas{flex-direction:column;align-items:stretch}
+  .btn-lg{justify-content:center}
+  .f-grid{grid-template-columns:1fr}
+  .features,.cta-sec{padding:72px 0}
+  .f2{grid-template-columns:1fr}
+  .form-glass{padding:26px 20px}
 }
-@media(max-width:480px){
-  .stats-row{grid-template-columns:1fr}
-  .topbar-right .btn span{display:none}
-  .stat-val{font-size:28px}
-  .bubble{max-width:82%}
-  .tbl th,.tbl td{font-size:12px;padding:8px 8px}
-}
-
-/* ── DIRECTORATES ────────────────────────────────────────────────────── */
-.dir-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
-.dir-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px;transition:box-shadow .2s,transform .2s}
-.dir-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.08);transform:translateY(-2px)}
-.dir-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:12px}
-.dir-name{font-size:15px;font-weight:600;color:var(--text)}
-.dir-desc{font-size:12px;color:var(--text3);margin-top:3px}
-.dir-actions{display:flex;gap:5px;flex-shrink:0}
-.dir-footer{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)}
-/* assign-type radio toggle in task modal */
-.assign-toggle{display:flex;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:0}
-.assign-toggle input[type=radio]{display:none}
-.assign-toggle label{flex:1;text-align:center;padding:7px 10px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;color:var(--text2);background:var(--white)}
-.assign-toggle input[type=radio]:checked + label{background:var(--brand);color:#fff}
-/* directorate badge on tasks */
-.badge-dir{background:#EDE7F6;color:#4527A0}
-
-/* ── REQUESTS ────────────────────────────────────────────────────────── */
-.req-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px;overflow-x:auto}
-.req-tab{padding:9px 16px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;margin-bottom:-1px;white-space:nowrap;flex-shrink:0}
-.req-tab.active{color:var(--brand);border-bottom-color:var(--brand)}
-.req-tab:hover:not(.active){color:var(--text);background:var(--bg)}
-.req-row{display:flex;align-items:flex-start;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
-.req-row:last-child{border-bottom:none}
-.req-actions{display:flex;gap:6px;flex-shrink:0;align-items:center}
-textarea.fg-area{width:100%;border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 11px;font-size:13.5px;font-family:'Inter',sans-serif;color:var(--text);outline:none;resize:vertical;min-height:76px;transition:border .15s,box-shadow .15s}
-textarea.fg-area:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(92,107,192,.1)}
 </style>
 </head>
-
 <body>
-  <div class="landing-container">
-    <header class="hero-top">
-      <div class="hero-copy">
-        <p class="eyebrow">TeamFlow</p>
-        <h1>Workspace management for teams that move fast.</h1>
-        <p class="hero-text">Launch a branded workspace for your business, invite admins, directors, and members, and manage attendance, tasks, and requests in one place.</p>
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="login.html">Sign in</a>
-          <button class="btn btn-ghost" type="button" onclick="document.getElementById('landing-workspace-name').scrollIntoView({ behavior: 'smooth' })">Create workspace</button>
-        </div>
-      </div>
-      <div class="hero-visual">
-        <div class="hero-card">
-          <div class="card-badge">Branded workspace</div>
-          <h2>Welcome Himmedia and all growing teams</h2>
-          <p>Create a new workspace with custom logo, admin settings, directorates, and team members in minutes.</p>
-        </div>
-      </div>
-    </header>
 
-    <section class="features">
-      <div class="feature-card">
-        <h3>Workspace-first team flow</h3>
-        <p>Each workspace becomes a dedicated hub for your business, with its own members, directorates, and requests.</p>
-      </div>
-      <div class="feature-card">
-        <h3>Manage users, directors, and teams</h3>
-        <p>Invite admins, directors, and team members, assign directorates, and keep everyone aligned.</p>
-      </div>
-      <div class="feature-card">
-        <h3>Track requests, shifts, and tasks</h3>
-        <p>Keep every task, request, and clock-in in one place so team operations stay transparent.</p>
-      </div>
-    </section>
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+<div class="bg-orb orb-3"></div>
 
-    <section class="cta-section">
-      <div class="cta-copy">
-        <p class="eyebrow">Create your first workspace</p>
-        <h2>Start with your brand and your team.</h2>
-        <p>Set up a workspace today, then sign in to finish the admin onboarding and invite your team.</p>
-      </div>
-      <form class="cta-form" id="landing-workspace-form" onsubmit="event.preventDefault(); submitWorkspace();">
-        <label class="fg"><span>Workspace name</span><input id="landing-workspace-name" placeholder="Himmedia" required /></label>
-        <label class="fg"><span>Admin full name</span><input id="landing-admin-name" placeholder="Jane Doe" required /></label>
-        <label class="fg"><span>Admin email</span><input id="landing-admin-email" type="email" placeholder="admin@company.com" required /></label>
-        <label class="fg"><span>Workspace logo</span><input id="landing-workspace-logo" type="file" accept="image/*" /></label>
-        <button class="btn btn-primary" id="create-workspace-btn" type="submit">Create workspace</button>
-        <div id="workspace-result" class="workspace-result"></div>
-      </form>
-    </section>
-
+<!-- NAV -->
+<nav class="topnav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">
+      <div class="logo-mark">TF</div>
+      <span class="logo-text">TeamFlow</span>
+    </a>
+    <div class="nav-btns">
+      <a class="btn btn-ghost" href="login.html">Sign in</a>
+      <a class="btn btn-gold" href="#create">Get started</a>
+    </div>
   </div>
+</nav>
 
-  <script>
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <div class="eyebrow-badge">
+          <span class="pulse-dot"></span>
+          Premium workspace platform
+        </div>
+        <h1 class="hero-h1">
+          Workspace management<br/>
+          <em class="grad">crafted for teams</em><br/>
+          that mean business.
+        </h1>
+        <p class="hero-sub">
+          Launch a branded workspace, invite your directors and team, then manage attendance, tasks, shifts, and requests — all from one elegant command centre.
+        </p>
+        <div class="hero-ctas">
+          <a class="btn btn-gold btn-lg" href="#create">Create your workspace</a>
+          <a class="btn btn-ghost btn-lg" href="login.html">Sign in &rarr;</a>
+        </div>
+        <div class="trust-row">
+          <div class="trust-avs">
+            <div class="tav"></div>
+            <div class="tav"></div>
+            <div class="tav"></div>
+            <div class="tav"></div>
+          </div>
+          <span>Trusted by growing teams worldwide</span>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="float-badge fb-green">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+          Workspace created
+        </div>
+        <div class="glass">
+          <div class="card-badge">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+            Branded workspace
+          </div>
+          <h2>Welcome to your<br/>command centre.</h2>
+          <p>Invite admins, directors, and team members. Assign roles, manage directorates, and keep your entire organisation running seamlessly from one place.</p>
+          <div class="mini-stats">
+            <div class="ms"><div class="ms-val">24</div><div class="ms-lbl">Members</div></div>
+            <div class="ms"><div class="ms-val">6</div><div class="ms-lbl">Directorates</div></div>
+            <div class="ms"><div class="ms-val">98%</div><div class="ms-lbl">Attendance</div></div>
+          </div>
+        </div>
+        <div class="float-badge fb-purple">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+          Shifts tracked live
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="strip">
+  <div class="mq">
+    <span class="mq-item"><span class="mq-dot"></span>Workspace management</span>
+    <span class="mq-item"><span class="mq-dot"></span>Team collaboration</span>
+    <span class="mq-item"><span class="mq-dot"></span>Attendance tracking</span>
+    <span class="mq-item"><span class="mq-dot"></span>Task management</span>
+    <span class="mq-item"><span class="mq-dot"></span>Shift scheduling</span>
+    <span class="mq-item"><span class="mq-dot"></span>Request management</span>
+    <span class="mq-item"><span class="mq-dot"></span>Directorate control</span>
+    <span class="mq-item"><span class="mq-dot"></span>Real-time messaging</span>
+    <span class="mq-item"><span class="mq-dot"></span>Workspace management</span>
+    <span class="mq-item"><span class="mq-dot"></span>Team collaboration</span>
+    <span class="mq-item"><span class="mq-dot"></span>Attendance tracking</span>
+    <span class="mq-item"><span class="mq-dot"></span>Task management</span>
+    <span class="mq-item"><span class="mq-dot"></span>Shift scheduling</span>
+    <span class="mq-item"><span class="mq-dot"></span>Request management</span>
+    <span class="mq-item"><span class="mq-dot"></span>Directorate control</span>
+    <span class="mq-item"><span class="mq-dot"></span>Real-time messaging</span>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="wrap">
+    <div class="features-hd reveal">
+      <p class="sec-eyebrow">Everything your team needs</p>
+      <h2 class="sec-h2">Built for how <span class="grad">great teams operate</span></h2>
+      <p class="sec-sub">One unified platform for workspace creation, team management, and operational excellence — designed to feel effortless.</p>
+    </div>
+    <div class="f-grid">
+      <div class="f-card reveal">
+        <div class="f-icon">
+          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+        </div>
+        <h3>Workspace-first architecture</h3>
+        <p>Each workspace is a dedicated hub with its own members, custom branding, directorates, and settings — fully isolated and branded to your organisation.</p>
+      </div>
+      <div class="f-card reveal">
+        <div class="f-icon">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+        <h3>Roles &amp; permissions</h3>
+        <p>Invite admins, directors, and members. Assign directorates, control permissions, and keep every person aligned with granular role controls.</p>
+      </div>
+      <div class="f-card reveal">
+        <div class="f-icon">
+          <svg viewBox="0 0 24 24"><polyline points="9,11 12,14 22,4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        </div>
+        <h3>Tasks &amp; request tracking</h3>
+        <p>Assign tasks with priorities and deadlines, process leave and expense requests, and maintain full operational transparency at all times.</p>
+      </div>
+      <div class="f-card reveal">
+        <div class="f-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+        </div>
+        <h3>Shifts &amp; attendance</h3>
+        <p>Clock in and out, track working hours, manage shift schedules, and get a real-time view of who is present — from anywhere.</p>
+      </div>
+      <div class="f-card reveal">
+        <div class="f-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        </div>
+        <h3>Team messaging</h3>
+        <p>Communicate in real-time with your team. Mention colleagues, share updates, and keep conversations within your workspace context.</p>
+      </div>
+      <div class="f-card reveal">
+        <div class="f-icon">
+          <svg viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+        </div>
+        <h3>Dashboards &amp; insights</h3>
+        <p>At-a-glance visibility on attendance trends, task completion, request volumes, and team performance — all in one elegant dashboard.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA / FORM -->
+<section class="cta-sec" id="create">
+  <div class="wrap">
+    <div class="cta-inner">
+      <div class="cta-copy reveal">
+        <p class="sec-eyebrow">Ready to begin?</p>
+        <h2 class="sec-h2">Start with your brand<br/><span class="grad">and your team.</span></h2>
+        <p class="cta-desc">Set up your workspace in minutes. Add your logo, create the admin account, then invite your whole team — TeamFlow handles the rest.</p>
+        <div class="perks">
+          <div class="perk"><span class="perk-ic">&#10003;</span> Free to create — no credit card required</div>
+          <div class="perk"><span class="perk-ic">&#10003;</span> Custom branding with your logo</div>
+          <div class="perk"><span class="perk-ic">&#10003;</span> Invite unlimited team members</div>
+          <div class="perk"><span class="perk-ic">&#10003;</span> Full admin control from day one</div>
+        </div>
+      </div>
+
+      <div class="form-glass reveal">
+        <h3>Create your workspace</h3>
+        <p class="f-sub">Get set up in under 2 minutes.</p>
+        <form id="landing-workspace-form" onsubmit="event.preventDefault(); submitWorkspace();">
+          <div class="fg">
+            <label>Workspace name</label>
+            <input id="landing-workspace-name" placeholder="e.g. Himmedia" required/>
+          </div>
+          <div class="f2">
+            <div class="fg">
+              <label>Admin full name</label>
+              <input id="landing-admin-name" placeholder="Jane Doe" required/>
+            </div>
+            <div class="fg">
+              <label>Admin email</label>
+              <input id="landing-admin-email" type="email" placeholder="admin@company.com" required/>
+            </div>
+          </div>
+          <div class="fg">
+            <label for="landing-workspace-logo">Workspace logo <span class="label-opt">(optional)</span></label>
+            <input id="landing-workspace-logo" type="file" accept="image/*" title="Upload workspace logo"/>
+          </div>
+          <button class="btn btn-gold btn-submit" id="create-workspace-btn" type="submit">
+            Create workspace &rarr;
+          </button>
+          <div id="workspace-result" class="ws-result"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot">
+    <div class="foot-logo">
+      <div class="foot-mark">TF</div>
+      TeamFlow
+    </div>
+    <p class="foot-copy">&copy; 2025 TeamFlow &mdash; Built for teams that mean business.</p>
+  </div>
+</footer>
+
+<script>
+function escapeHtml(str){
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function setResult(msg, isErr){
+  const el = document.getElementById('workspace-result');
+  el.className = 'ws-result ' + (isErr ? 'err' : 'success');
+  el.textContent = msg;
+}
+
+async function submitWorkspace(){
+  const name       = document.getElementById('landing-workspace-name').value.trim();
+  const adminName  = document.getElementById('landing-admin-name').value.trim();
+  const adminEmail = document.getElementById('landing-admin-email').value.trim();
+  const file       = document.getElementById('landing-workspace-logo').files[0];
+
+  if(!name || !adminName || !adminEmail){
+    setResult('Workspace name, admin name, and admin email are required.', true);
+    return;
   }
 
-  function setResult(message, isError = false) {
-    const area = document.getElementById('workspace-result');
-    area.className = 'workspace-result' + (isError ? ' err' : ' success');
-    area.textContent = message;
+  const fd = new FormData();
+  fd.append('name', name);
+  fd.append('admin_name', adminName);
+  fd.append('admin_email', adminEmail);
+  if(file) fd.append('logo', file);
+
+  const btn = document.getElementById('create-workspace-btn');
+  btn.disabled = true;
+  btn.textContent = 'Creating…';
+  setResult('Creating your workspace…', false);
+
+  try{
+    const res  = await fetch('Teamapi/workspaces.php', {method:'POST', body:fd});
+    const data = await res.json();
+    if(!res.ok || data.error){ setResult(data.error || 'Unable to create workspace. Please try again.', true); return; }
+    document.getElementById('landing-workspace-form').reset();
+    const el = document.getElementById('workspace-result');
+    el.className = 'ws-result success';
+    el.innerHTML = `Workspace created!<br/>Email: <strong>${escapeHtml(data.admin_email)}</strong><br/>Temp password: <strong>${escapeHtml(data.admin_temp_password)}</strong><br/><a href="login.html">Sign in &rarr;</a>`;
+  } catch(e){
+    setResult('An error occurred. Please try again.', true);
+  } finally{
+    btn.disabled = false;
+    btn.textContent = 'Create workspace →';
   }
+}
 
-  async function submitWorkspace() {
-    const name = document.getElementById('landing-workspace-name').value.trim();
-    const adminName = document.getElementById('landing-admin-name').value.trim();
-    const adminEmail = document.getElementById('landing-admin-email').value.trim();
-    const logoInput = document.getElementById('landing-workspace-logo');
-    const file = logoInput.files[0];
-
-    if (!name || !adminName || !adminEmail) {
-      setResult('Workspace name, admin name, and admin email are required.', true);
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('admin_name', adminName);
-    formData.append('admin_email', adminEmail);
-    if (file) {
-      formData.append('logo', file);
-    }
-
-    const submitBtn = document.getElementById('create-workspace-btn');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Creating…';
-    setResult('Creating workspace...');
-
-    try {
-      const res = await fetch('Teamapi/workspaces.php', {
-        method: 'POST',
-        body: formData
-      });
-      const data = await res.json();
-
-      if (!res.ok || data.error) {
-        setResult(data.error || 'Unable to create the workspace. Please try again.', true);
-        return;
-      }
-
-      document.getElementById('landing-workspace-form').reset();
-      const area = document.getElementById('workspace-result');
-      area.className = 'workspace-result success';
-      area.innerHTML = `Workspace created successfully!<br/>Admin email: <strong>${escapeHtml(data.admin_email)}</strong><br/>Temporary password: <strong>${escapeHtml(data.admin_temp_password)}</strong><br/><a href="login.html">Go to login</a>`;
-    } catch (err) {
-      setResult('An error occurred while creating the workspace. Please try again.', true);
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Create workspace';
-    }
-  }
-  </script>
+// Scroll-reveal
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+}, {threshold:.12});
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
 </body>
 </html>
