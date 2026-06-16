@@ -7,6 +7,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 $uid    = $CURRENT_USER_ID;
 $role   = $CURRENT_USER['user_role'];
+$wid    = $CURRENT_WORKSPACE_ID;
 
 // CLOCK IN
 if ($method === 'POST' && $action === 'clock_in') {
@@ -17,7 +18,7 @@ if ($method === 'POST' && $action === 'clock_in') {
     respond(['success' => true, 'clock_in' => date('Y-m-d H:i:s')]);
 }
 
-// SAVE TASK NOTE (posted 30s after clock-in when member submits focus modal)
+// SAVE TASK NOTE
 if ($method === 'POST' && $action === 'save_task_note') {
     $body = json_decode(file_get_contents('php://input'), true);
     $note = safe($db, trim($body['note'] ?? ''));
@@ -48,16 +49,19 @@ if ($method === 'GET' && $action === 'status') {
     respond($rec ?: ['clock_in' => null, 'clock_out' => null, 'work_minutes' => null]);
 }
 
-// GET RECORDS (date filter, role-scoped)
+// GET RECORDS (date filter, role-scoped, workspace-scoped)
 if ($method === 'GET') {
     $date = safe($db, $_GET['date'] ?? date('Y-m-d'));
 
     if ($role === 'admin') {
         $rows = $db->query(
             "SELECT a.*, m.name AS member_name, m.avatar_color, m.role AS job_role
-             FROM attendance a JOIN members m ON a.member_id = m.id
-             WHERE a.date='$date' ORDER BY a.clock_in DESC"
+             FROM attendance a
+             JOIN members m ON a.member_id = m.id
+             WHERE a.date='$date' AND m.workspace_id = $wid
+             ORDER BY a.clock_in DESC"
         )->fetch_all(MYSQLI_ASSOC);
+
     } elseif ($role === 'director') {
         $myDirRow = $db->query("SELECT directorate_id FROM members WHERE id=$uid")->fetch_assoc();
         $myDirId  = $myDirRow ? (int)$myDirRow['directorate_id'] : 0;
@@ -66,15 +70,19 @@ if ($method === 'GET') {
             : "(m.director_id = $uid OR a.member_id = $uid)";
         $rows = $db->query(
             "SELECT a.*, m.name AS member_name, m.avatar_color, m.role AS job_role
-             FROM attendance a JOIN members m ON a.member_id = m.id
-             WHERE a.date='$date' AND ($scope)
+             FROM attendance a
+             JOIN members m ON a.member_id = m.id
+             WHERE a.date='$date' AND m.workspace_id = $wid AND ($scope)
              ORDER BY a.clock_in DESC"
         )->fetch_all(MYSQLI_ASSOC);
+
     } else {
         $rows = $db->query(
             "SELECT a.*, m.name AS member_name, m.avatar_color
-             FROM attendance a JOIN members m ON a.member_id = m.id
-             WHERE a.member_id=$uid AND a.date='$date' ORDER BY a.clock_in DESC"
+             FROM attendance a
+             JOIN members m ON a.member_id = m.id
+             WHERE a.member_id=$uid AND a.date='$date'
+             ORDER BY a.clock_in DESC"
         )->fetch_all(MYSQLI_ASSOC);
     }
     respond($rows);

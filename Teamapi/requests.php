@@ -2,29 +2,31 @@
 require_once 'config.php';
 require_once 'auth_check.php';
 
-$db     = db();
+$db   = db();
 $method = $_SERVER['REQUEST_METHOD'];
 $role   = $CURRENT_USER['user_role'];
 $uid    = $CURRENT_USER_ID;
+$wid    = $CURRENT_WORKSPACE_ID;
 $id     = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-// ── Scope: which requests can this user see / act on? ────────────────────
-function reqScope($db, $uid, $role) {
-    if ($role === 'admin') return '1=1';
+// Scope: which requests can this user see, filtered to current workspace
+function reqScope($db, $uid, $role, $wid) {
+    if ($role === 'admin')
+        return "lr.member_id IN (SELECT id FROM members WHERE workspace_id=$wid AND status!='inactive')";
     if ($role === 'director') {
         $r     = $db->query("SELECT directorate_id FROM members WHERE id=$uid")->fetch_assoc();
         $myDir = $r ? (int)$r['directorate_id'] : 0;
         if ($myDir > 0)
-            return "(lr.member_id IN (SELECT id FROM members WHERE directorate_id=$myDir AND status!='inactive') OR lr.member_id=$uid)";
-        return "(lr.member_id IN (SELECT id FROM members WHERE director_id=$uid) OR lr.member_id=$uid)";
+            return "(lr.member_id IN (SELECT id FROM members WHERE directorate_id=$myDir AND workspace_id=$wid AND status!='inactive') OR lr.member_id=$uid)";
+        return "(lr.member_id IN (SELECT id FROM members WHERE director_id=$uid AND workspace_id=$wid) OR lr.member_id=$uid)";
     }
     return "lr.member_id = $uid";
 }
 
-// ── GET — list requests ──────────────────────────────────────────────────
+// ── GET ──────────────────────────────────────────────────────────────────
 if ($method === 'GET') {
     $sf    = isset($_GET['status']) ? safe($db, $_GET['status']) : '';
-    $scope = reqScope($db, $uid, $role);
+    $scope = reqScope($db, $uid, $role, $wid);
     $where = "($scope)";
     if ($sf && in_array($sf, ['pending','approved','rejected']))
         $where .= " AND lr.status = '$sf'";
@@ -44,18 +46,17 @@ if ($method === 'GET') {
     respond($rows->fetch_all(MYSQLI_ASSOC));
 }
 
-// ── POST — create OR review ──────────────────────────────────────────────
+// ── POST ─────────────────────────────────────────────────────────────────
 if ($method === 'POST') {
     $b = body();
 
-    // ── Review action (approve / reject) ──────────────────────────────
+    // Review action (approve / reject)
     if (isset($b['action']) && in_array($b['action'], ['approve','reject'])) {
         if ($role === 'member') respond(['error' => 'Forbidden'], 403);
         if (!$id)               respond(['error' => 'ID required'], 400);
 
-        // Directors may only review requests within their scope
         if ($role === 'director') {
-            $scope = reqScope($db, $uid, $role);
+            $scope = reqScope($db, $uid, $role, $wid);
             $ok    = $db->query("SELECT id FROM leave_requests lr WHERE lr.id=$id AND ($scope)")->fetch_assoc();
             if (!$ok) respond(['error' => 'Forbidden'], 403);
         }
@@ -70,7 +71,7 @@ if ($method === 'POST') {
         respond(['success' => true, 'status' => $newStatus]);
     }
 
-    // ── Create new request ─────────────────────────────────────────────
+    // Create new request
     $valid_types = ['annual_leave','sick_leave','emergency_leave',
                     'maternity_leave','paternity_leave','short_break','other'];
     $type = in_array($b['type'] ?? '', $valid_types) ? $b['type'] : null;
@@ -89,18 +90,16 @@ if ($method === 'POST') {
     respond(['success' => true, 'id' => $db->insert_id], 201);
 }
 
-// ── DELETE — member cancels pending; admin/director can delete in scope ──
+// ── DELETE ───────────────────────────────────────────────────────────────
 if ($method === 'DELETE' && $id) {
-    $req = $db->query(
-        "SELECT member_id, status FROM leave_requests WHERE id=$id"
-    )->fetch_assoc();
+    $req = $db->query("SELECT member_id, status FROM leave_requests WHERE id=$id")->fetch_assoc();
     if (!$req) respond(['error' => 'Not found'], 404);
 
     if ($role === 'member') {
-        if ($req['member_id'] != $uid)      respond(['error' => 'Forbidden'], 403);
-        if ($req['status'] !== 'pending')   respond(['error' => 'Only pending requests can be cancelled'], 400);
+        if ($req['member_id'] != $uid)    respond(['error' => 'Forbidden'], 403);
+        if ($req['status'] !== 'pending') respond(['error' => 'Only pending requests can be cancelled'], 400);
     } elseif ($role === 'director') {
-        $scope = reqScope($db, $uid, $role);
+        $scope = reqScope($db, $uid, $role, $wid);
         $ok    = $db->query("SELECT id FROM leave_requests lr WHERE lr.id=$id AND ($scope)")->fetch_assoc();
         if (!$ok) respond(['error' => 'Forbidden'], 403);
     }

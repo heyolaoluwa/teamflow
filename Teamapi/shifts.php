@@ -2,13 +2,13 @@
 require_once 'config.php';
 require_once 'auth_check.php';
 
-$db     = db();
+$db   = db();
 $method = $_SERVER['REQUEST_METHOD'];
 $role   = $CURRENT_USER['user_role'];
 $uid    = $CURRENT_USER_ID;
+$wid    = $CURRENT_WORKSPACE_ID;
 $id     = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-// Helper: directorate scope for current director
 function directorMemberScope($db, $uid) {
     $r = $db->query("SELECT directorate_id FROM members WHERE id=$uid")->fetch_assoc();
     $myDirId = $r ? (int)$r['directorate_id'] : 0;
@@ -24,23 +24,25 @@ if ($method === 'GET') {
     if ($role === 'admin') {
         $r = $db->query(
             "SELECT s.*, m.name AS member_name, m.avatar_color, m.role AS member_role
-             FROM shifts s JOIN members m ON s.member_id = m.id
-             WHERE s.shift_date = '$date'
+             FROM shifts s
+             JOIN members m ON s.member_id = m.id
+             WHERE s.shift_date = '$date' AND m.workspace_id = $wid
              ORDER BY s.start_time"
         );
     } elseif ($role === 'director') {
         $scope = directorMemberScope($db, $uid);
         $r = $db->query(
             "SELECT s.*, m.name AS member_name, m.avatar_color, m.role AS member_role
-             FROM shifts s JOIN members m ON s.member_id = m.id
-             WHERE s.shift_date = '$date' AND ($scope)
+             FROM shifts s
+             JOIN members m ON s.member_id = m.id
+             WHERE s.shift_date = '$date' AND m.workspace_id = $wid AND ($scope)
              ORDER BY s.start_time"
         );
     } else {
-        // Member sees only their own shifts
         $r = $db->query(
             "SELECT s.*, m.name AS member_name, m.avatar_color, m.role AS member_role
-             FROM shifts s JOIN members m ON s.member_id = m.id
+             FROM shifts s
+             JOIN members m ON s.member_id = m.id
              WHERE s.shift_date = '$date' AND s.member_id = $uid
              ORDER BY s.start_time"
         );
@@ -54,8 +56,13 @@ if ($method === 'GET') {
 // ── POST ─────────────────────────────────────────────────────────────────
 if ($method === 'POST') {
     if ($role === 'member') respond(['error' => 'Forbidden'], 403);
-    $b      = body();
-    $mid    = (int)($b['member_id'] ?? 0);
+    $b    = body();
+    $mid  = (int)($b['member_id'] ?? 0);
+    // Verify the target member belongs to this workspace
+    if ($mid) {
+        $check = $db->query("SELECT id FROM members WHERE id=$mid AND workspace_id=$wid")->fetch_assoc();
+        if (!$check) respond(['error' => 'Member not found in this workspace'], 403);
+    }
     $date   = safe($db, $b['shift_date']  ?? date('Y-m-d'));
     $start  = safe($db, $b['start_time']  ?? '09:00');
     $end    = safe($db, $b['end_time']    ?? '17:00');
@@ -71,6 +78,11 @@ if ($method === 'POST') {
 // ── DELETE ───────────────────────────────────────────────────────────────
 if ($method === 'DELETE' && $id) {
     if ($role === 'member') respond(['error' => 'Forbidden'], 403);
-    $db->query("DELETE FROM shifts WHERE id = $id");
+    // Only delete shifts belonging to this workspace
+    $db->query(
+        "DELETE s FROM shifts s
+         JOIN members m ON s.member_id = m.id
+         WHERE s.id = $id AND m.workspace_id = $wid"
+    );
     respond(['success' => true]);
 }
