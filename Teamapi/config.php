@@ -53,7 +53,15 @@ function respond($data, $code = 200) {
 }
 
 function body() {
-    return json_decode(file_get_contents('php://input'), true) ?? [];
+    $raw = file_get_contents('php://input');
+    $json = json_decode($raw, true);
+    if (is_array($json)) {
+        return $json;
+    }
+    if (!empty($_POST)) {
+        return $_POST;
+    }
+    return [];
 }
 
 function safe($conn, $val) {

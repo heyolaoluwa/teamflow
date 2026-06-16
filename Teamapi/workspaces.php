@@ -40,6 +40,45 @@ if ($method === 'POST') {
 
     $desc      = safe($db, $b['description'] ?? '');
     $logo_url  = safe($db, $b['logo_url'] ?? '');
+
+    if (empty($logo_url) && isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
+        $allowedTypes = [
+            'image/jpeg' => 'jpg',
+            'image/png'  => 'png',
+            'image/gif'  => 'gif',
+            'image/webp' => 'webp',
+        ];
+        $tmpPath = $_FILES['logo']['tmp_name'];
+        if (function_exists('finfo_open')) {
+            $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mimeType = finfo_file($fileInfo, $tmpPath);
+            finfo_close($fileInfo);
+        } elseif (function_exists('mime_content_type')) {
+            $mimeType = mime_content_type($tmpPath);
+        } else {
+            respond(['error' => 'Logo upload validation not supported on this server'], 500);
+        }
+
+        if (!isset($allowedTypes[$mimeType])) {
+            respond(['error' => 'Logo file must be a PNG, JPG, GIF, or WEBP image'], 400);
+        }
+        if ($_FILES['logo']['size'] > 5 * 1024 * 1024) {
+            respond(['error' => 'Logo file must be 5MB or smaller'], 400);
+        }
+
+        $uploadDir = __DIR__ . '/../uploads';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $filename = 'workspace-logo-' . time() . '-' . bin2hex(random_bytes(6)) . '.' . $allowedTypes[$mimeType];
+        $destPath = $uploadDir . '/' . $filename;
+        if (!move_uploaded_file($tmpPath, $destPath)) {
+            respond(['error' => 'Unable to save workspace logo'], 500);
+        }
+        $logo_url = 'uploads/' . $filename;
+    }
+
     $created_by = isset($_SESSION['member_id']) ? (int)$_SESSION['member_id'] : 'NULL';
 
     $db->query(
